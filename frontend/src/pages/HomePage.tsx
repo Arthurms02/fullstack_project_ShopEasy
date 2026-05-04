@@ -1,6 +1,6 @@
-import React from "react";
 import Header  from "../components/Header";
 import Cart from "../features/cart/Cart";
+import SellProduct from "../features/product/SellProduct";
 
 
 export default function HomePage() {
@@ -17,6 +17,7 @@ export default function HomePage() {
                 <p>This is a protected page. You must be logged in to see this content.</p>
                 <Cart />
             </div>
+            <SellProduct />
         </>
     );
 }

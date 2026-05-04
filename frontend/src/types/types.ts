@@ -1,3 +1,5 @@
+import type { Product } from "../features/product/productType";
+
 export type HeaderProps = {
     onSearch: (query: string) => void;
     isVendedor?: boolean;
@@ -8,11 +10,6 @@ export type HeaderProps = {
     } | null;
 };
 
-export type Product = {
-    id: number;
-    name: string;
-    description: string;
-    price: number;
-    stock: number;
-    image_url: string;
-};
+export type ProductCardProps = {
+  product: Product;
+}
