@@ -49,15 +49,15 @@ class User(AbstractBaseUser, PermissionsMixin , BaseModel):
     def save(self, *args, **kwargs):
         if self.is_superuser:
             self.role = 'admin'
-            if User.objects.filter(role='admin').exclude(pk=self.pk).exists():
-                raise ValueError("Já existe um usuário com o papel de admin.")
         elif self.role == 'admin':
             raise PermissionError("Não é permitido definir o papel como admin diretamente.")
 
         if self.role == "vendedor":
             self.is_staff = True
-        else:
+
+        if self.role == "cliente":
             self.is_staff = False
+
         super().save(*args, **kwargs)
 
 
