@@ -11,6 +11,15 @@ export type Product = {
 
 export type ProductState = {
   products: Product[];
-  loading: boolean;
+  isLoading: boolean;
   error: string | null;
+}
+
+export type ListParams = {
+  search?: string;
+  showDeleted?: boolean;
+  [k: string]: any };
+
+export type ProductCardProps = {
+  product: Product;
 }

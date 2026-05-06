@@ -14,7 +14,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { createProduct } from "./productAPI";
 
-// ── Schema — alinhado com o corpo da API ──────────────────────────────────────
 // POST /products → { name, description, price, stock, image_url }
 const schema = yup.object({
   name: yup
@@ -53,7 +52,7 @@ const STEP_FIELDS: Record<number, (keyof FormValues)[]> = {
   3: ["image_url"],
 };
 
-// ── Component ────────────────────────────────────────────────────────────────
+
 export default function Sell() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -102,7 +101,7 @@ export default function Sell() {
       hasError ? "border-red-400 bg-red-50" : "border-gray-300"
     }`;
 
-  // ── Submitted ─────────────────────────────────────────────────────────────
+
   if (submitted) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">

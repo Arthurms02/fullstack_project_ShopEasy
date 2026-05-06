@@ -1,32 +1,32 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { ProductState } from '../../types';
+import type { ProductState } from './productType';
 
 
 const initialState: ProductState = {
   products: [],
-  loading: false,
+  isLoading: false,
   error: null,
 };
 
 const productSlice = createSlice({
-  name: 'product',
+  name: 'products',
   initialState,
   reducers: {
     fetchProductsStart(state) {
-      state.loading = true;
+      state.isLoading = true;
       state.error = null;
     },
     fetchProductsSuccess(state, action: PayloadAction<ProductState['products']>) {
       state.products = action.payload;
-      state.loading = false;
+      state.isLoading = false;
     },
     fetchProductsFailure(state, action: PayloadAction<string>) {
       state.error = action.payload;
-      state.loading = false;
+      state.isLoading = false;
     },
   },
 });
 
-export const { fetchProductsStart, fetchProductsSuccess, fetchProductsFailure } = productSlice.actions;
+export const { fetchProductsStart, fetchProductsSuccess, fetchProductsFailure   } = productSlice.actions;
 
 export default productSlice.reducer;

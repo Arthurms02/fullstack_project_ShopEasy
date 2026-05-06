@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loginStart, loginSuccess, loginFailure } from './authSlice';
 import { loginRequest } from './authAPI';
 import { type RootState } from '../../app/store';
-
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -18,7 +18,7 @@ const loginSchema = yup.object().shape({
 type LoginFormData = yup.InferType<typeof loginSchema>;
 
 export default function LoginForm() {
-
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const { isLoading, error } = useSelector((state: RootState) => state.auth);
 
@@ -31,10 +31,23 @@ export default function LoginForm() {
         dispatch(loginStart());
         try {
             const response = await loginRequest(data.email, data.password);
-            dispatch(loginSuccess(response));
-            console.log('Login bem-sucedido:', response);
-        } catch (err: any) {
-            dispatch(loginFailure(err));
+
+            if (response.status === 200) {
+
+                const payload = response.data?.user ?? response.data; // busca o objeto user ou usa o response.data diretamente
+                dispatch(loginSuccess(payload));
+                navigate('/'); // Redireciona para a página inicial após o login bem-sucedido
+            } else {
+                dispatch(loginFailure("Erro inesperado ao fazer login, verifique suas credenciais e tente novamente."));
+                navigate('/login'); // Redireciona de volta para a página de login
+            }
+        } catch (error: any) {
+            // Tratamento seguro da mensagem de erro
+            const mensagem = error.response?.data?.detail
+                || error.response?.data?.message
+                || "Credenciais inválidas";
+
+            dispatch(loginFailure(mensagem));
         }
     };
 

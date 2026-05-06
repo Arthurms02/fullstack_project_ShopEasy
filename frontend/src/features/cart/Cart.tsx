@@ -9,18 +9,24 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { clearCart, removeFromCart, selectCartItems, setCart, updateQuantity } from "./cartSlice";
-import { fetchCart } from "./cartAPI";
+import { clearCart, removeFromCart, selectCartItems, selectTotalItems, selectTotalPrice, setCart, updateQuantity } from "./cartSlice";
+import { clearCartApi, fetchCart, removeFromCartApi, updateQuantityApi } from "./cartAPI";
 
 
 
 export default function Cart() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const items = useSelector(selectCartItems);
 
     const [coupon, setCoupon] = useState("");
     const [couponApplied, setCouponApplied] = useState(false);
+
+    const items = useSelector(selectCartItems);
+    const totalItems = useSelector(selectTotalItems);
+    const totalPrice = useSelector(selectTotalPrice);
+    const discount = couponApplied ? totalPrice * 0.1 : 0; // Exemplo: 10% de desconto
+    const shipping = totalPrice - discount > 500 ? 0 : 20; // Frete grátis para pedidos acima de R$500
+    const finalPrice = totalPrice - discount + shipping;
 
     useEffect(() => {
         (async () => {
@@ -38,11 +44,6 @@ export default function Cart() {
         })();
     }, [dispatch]);
 
-    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-    const discount = couponApplied ? totalPrice * 0.1 : 0; // Exemplo: 10% de desconto
-    const shipping = totalPrice - discount > 500 ? 0 : 20; // Frete grátis para pedidos acima de R$500
-    const finalPrice = totalPrice - discount + shipping;
 
     const applyCoupon = () => {
         if (coupon === "DESCONTO10") {
@@ -56,7 +57,67 @@ export default function Cart() {
     };
 
 
-    if (items.length === 0) {
+    const handleUpdateQuantity = async (id: number, nova_quantidade: number) => {
+
+        console.log("Atualizando quantidade para produto"+ id + "nova quantidade:", nova_quantidade);
+
+        updateQuantity({ id, quantity: nova_quantidade });
+
+        try {
+            const response = await updateQuantityApi(id, nova_quantidade);
+            const data = response.data;
+            console.log("Resposta da API:", response);
+            if ( response ) {
+                console.log("DADOS QUE VIERAM DA API:", response);
+                // Normaliza: API pode retornar um array ou um objeto { items: [...] }
+                const itemsArr = Array.isArray(response) ? response : (response?.items ?? []);
+                console.log("Items extraídos da resposta:", itemsArr);
+                const mapped = itemsArr.map((i: any) => ({
+                    id: i.id,
+                    product: i.product,
+                    quantity: Number(i.quantity) || 0,
+                }));
+
+            dispatch(setCart(mapped)); // sempre um array
+       } else {
+                console.warn(response);
+                console.warn("A API respondeu, mas os dados vieram vazios.");
+            }} catch (error: any) {
+            // Agora você verá o erro real aqui
+            console.error("Erro capturado:", error.response?.data || error.message);
+        }
+    };
+
+    const handleRemoveItem = async (id: number) => {
+        try{
+            const response = await removeFromCartApi(id);
+            console.log("Resposta da API ao remover item:", response);
+            if (response.status === 204 || response.status === 200) {
+                dispatch(removeFromCart(id));
+            } else {
+                console.warn("A API respondeu, mas os dados vieram vazios.");
+            }
+        } catch (error) {
+            console.error("Erro ao remover item do carrinho:", error);
+        }
+    };
+
+    const handleClearCart = async  () => {
+        try {
+            const response = await clearCartApi();
+            if (response.status === 200 || response.status === 204) {
+                dispatch(clearCart());
+            } else {
+                console.warn("A API respondeu, mas os dados vieram vazios.");
+            }
+        } catch (error) {
+            console.error("Erro ao limpar o carrinho:", error);
+        }
+    };
+
+
+
+    if (items?.length === 0) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center max-w-sm">
@@ -103,9 +164,9 @@ export default function Cart() {
                 <div className="grid lg:grid-cols-3 gap-6">
                     {/* Cart items */}
                     <div className="lg:col-span-2 space-y-3">
-                        {items.map(({ product, quantity }) => (
+                        {items?.map(({ id , product, quantity }) => (
                             <div
-                                key={product.id}
+                                key={id}
                                 className="bg-white rounded-xl border border-gray-200 p-4 flex gap-4"
                             >
                                 <Link to={`/produto/${product.id}`} className="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28">
@@ -126,7 +187,7 @@ export default function Cart() {
                                             {product.name}
                                         </Link>
                                         <button
-                                            onClick={() => dispatch(removeFromCart(product.id))}
+                                            onClick={() => handleRemoveItem(id)}
                                             className="text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
                                         >
                                             <Trash2 className="w-4 h-4" />
@@ -143,14 +204,17 @@ export default function Cart() {
                                         <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
                                             <button onClick={() => {
                                                 const newQty = quantity - 1;
-                                                if (newQty <= 0) dispatch(removeFromCart(product.id));
-                                                else dispatch(updateQuantity({ productId: product.id, quantity: newQty }));
+                                                if (newQty <= 0) {
+                                                    handleUpdateQuantity(id, 0);
+                                                } else {
+                                                    handleUpdateQuantity(id, newQty);
+                                                }
                                             }}>−</button>
                                             <span className="px-3 py-1.5 text-gray-900 text-sm font-medium">
                                                 {quantity}
                                             </span>
                                             <button
-                                                onClick={() => dispatch(updateQuantity({ productId: product.id, quantity: quantity + 1 }))}
+                                                onClick={() => handleUpdateQuantity(id, quantity + 1)}
                                                 className="px-2.5 py-1.5 text-gray-600 hover:bg-gray-50 transition-colors text-sm"
                                             >
                                                 +
@@ -173,7 +237,7 @@ export default function Cart() {
                         {/* Clear cart */}
                         <div className="flex justify-end">
                             <button
-                                onClick={() => dispatch(clearCart())}
+                                onClick={() => handleClearCart()}
                                 className="text-sm text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1.5"
                             >
                                 <Trash2 className="w-4 h-4" />
@@ -222,7 +286,7 @@ export default function Cart() {
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-500">Subtotal</span>
                                     <span className="text-gray-900">
-                                        R$ {totalPrice.toLocaleString("pt-BR")}
+                                        R$ {(totalPrice || 0).toLocaleString("pt-BR")}
                                     </span>
                                 </div>
                                 {discount > 0 && (

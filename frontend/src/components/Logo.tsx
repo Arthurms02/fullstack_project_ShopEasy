@@ -8,7 +8,7 @@ export default function Logo() {
               <Store className="w-5 h-5 text-white" />
           </div>
           <span className="text-gray-900 font-semibold text-lg hidden sm:block">
-              Mercado<span className="text-orange-500">Livre</span>
+              Livre<span className="text-orange-500">Mercado</span>
           </span>
       </Link>
   );

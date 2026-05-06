@@ -1,9 +1,9 @@
 import api from '../../app/api';
 import type { Product } from './productType';
+import type { ListParams }  from './productType';
 
 const BASE = '/api/v1/products/';
 
-type ListParams = { search?: string; showDeleted?: boolean; [k: string]: any };
 
 /**
  * Faz paginação automática se a resposta for paginada (DRF padrão).

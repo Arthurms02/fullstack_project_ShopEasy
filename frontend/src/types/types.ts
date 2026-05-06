@@ -1,4 +1,4 @@
-import type { Product } from "../features/product/productType";
+
 
 export type HeaderProps = {
     onSearch: (query: string) => void;
@@ -10,6 +10,6 @@ export type HeaderProps = {
     } | null;
 };
 
-export type ProductCardProps = {
-  product: Product;
-}
+export type LoadingProps = { text?: string; fullScreen?: boolean };
+
+

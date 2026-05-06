@@ -22,7 +22,6 @@ const authSlice = createSlice({
             state.error = null;
         },
         loginSuccess: (state, action: PayloadAction<LoginPayload>) => {
-
             state.isLoading = false;
             state.nome_completo = action.payload.nome_completo;
             state.email = action.payload.email;

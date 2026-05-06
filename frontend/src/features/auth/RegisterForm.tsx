@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { RegisterRequest } from './authAPI';
+import { useNavigate } from 'react-router-dom';
 
 
 // definir a schema de validação usando yup
@@ -15,15 +16,17 @@ const registerSchema = yup.object().shape({
 type RegisterFormData = yup.InferType<typeof registerSchema>;
 
 export default function RegisterForm() {
+    const navigate = useNavigate();
 
+    // configurar o react-hook-form com a validação do yup
     const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
         resolver: yupResolver(registerSchema),
     });
 
     const onSubmit = async (data: RegisterFormData) => {
         try {
-            const response = await RegisterRequest(data.username, data.email, data.password, data.role);
-            console.log('Registro bem-sucedido:', response);
+            await RegisterRequest(data.username, data.email, data.password, data.role);
+            navigate('/login');
         } catch (err: any) {
             console.error('Erro ao registrar usuário:', err);
         }

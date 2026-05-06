@@ -1,27 +1,39 @@
 import { Link } from "react-router";
 import { Star, MapPin, ShoppingCart, Heart } from "lucide-react";
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import type { ProductCardProps } from "../types/types";
+import { useDispatch } from "react-redux";
+import type { ProductCardProps } from "../features/product/productType";
+import { addToCart } from "../features/cart/cartSlice";
+import { addToCartApi } from "../features/cart/cartAPI";
 
 
 
-export function ProductCard({ product }: ProductCardProps) {
-  const { addToCart } = useSelector((state: any) => state.cart);
+
+export default function ProductCard({ product }: ProductCardProps) {
+  const dispatch = useDispatch();
   const [wishlist, setWishlist] = useState(false);
   const [added, setAdded] = useState(false);
 
-  const discount = product.price 
+  const discount = product.price
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCart(product);
+    console.log("Adicionando ao carrinho:", product);
+    dispatch(addToCart(product));
+    try{
+      const response = await addToCartApi(product);
+      console.log("Resposta da API:", response);
+
+    }catch (error) {
+      console.error("Erro ao adicionar ao carrinho:", error);
+    }
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };
+
 
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -98,11 +110,10 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Add to cart */}
           <button
             onClick={handleAddToCart}
-            className={`w-full py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all ${
-              added
+            className={`w-full py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all ${added
                 ? "bg-green-500 text-white"
                 : "bg-orange-500 hover:bg-orange-600 text-white"
-            }`}
+              }`}
           >
             <ShoppingCart className="w-4 h-4" />
             {added ? "Adicionado!" : "Adicionar ao Carrinho"}

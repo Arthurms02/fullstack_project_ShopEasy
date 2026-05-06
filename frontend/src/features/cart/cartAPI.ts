@@ -1,4 +1,4 @@
-import type { Product } from '../../types/types';
+import type { Product } from '../product/productType';
 import api from '../../app/api';
 
 export async function fetchCart() {
@@ -7,16 +7,21 @@ export async function fetchCart() {
 }
 
 export async function addToCartApi(product: Product) {
-  const res = await api.post('/api/v1/cart/', { productId: product.id });
+  const res = await api.post('/api/v1/cart-items/', { product: product });
   return res.data;
 }
 
 export async function removeFromCartApi(cartItemId: number) {
-  const res = await api.delete(`/api/v1/cart/${cartItemId}/`);
-  return res.data;
+  const res = await api.delete(`/api/v1/cart-items/${cartItemId}/`);
+  return res;
 }
 
-export async function updateQuantityApi(cartItemId: number, quantity: number) {
-  const res = await api.patch(`/api/v1/cart/${cartItemId}/`, { quantity });
+export async function clearCartApi() {
+  const res = await api.delete('/api/v1/cart/clear/');
+  return res;
+}
+
+export async function updateQuantityApi(id: number, quantity: number) {
+  const res = await api.patch(`/api/v1/cart-items/${id}/`, {quantity });
   return res.data;
 }
