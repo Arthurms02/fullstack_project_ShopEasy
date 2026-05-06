@@ -1,13 +1,27 @@
+
 from rest_framework import viewsets, status, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from ShopEasy.models import CartItem, Category, Product, Order, PaymentTransaction, OrderItem, User, Cart
-from ShopEasy.api.v1.serializers import CartItemSerializer, CartSerializer, CategorySerializer, CookieTokenRefreshSerializer, ProductSerializer, OrderSerializer, PaymentTransactionSerializer, OrderItemSerializer, RegisterSerializer, UserSerializer
+from ShopEasy.api.v1.serializers import (CartItemSerializer, CartSerializer, CategorySerializer,
+                                         CookieTokenRefreshSerializer, ProductSerializer, OrderSerializer,
+                                           PaymentTransactionSerializer,
+                                         OrderItemSerializer, RegisterSerializer, UserSerializer)
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView)
 
 from core import settings
+
+class LogoutViewSet(viewsets.GenericViewSet):
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=['post'])
+    def logout(self, request):
+        response = Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
+        response.delete_cookie("access_token", path="/")
+        response.delete_cookie("refresh_token", path="/")
+        return response
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -127,20 +141,81 @@ class CartViewSet(viewsets.GenericViewSet):
             return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
         return Response(CartItemSerializer(item).data)
 
-    def partial_update(self, request, pk=None):
-        qty = request.data.get("quantity")
-        if qty is None:
-            return Response({"error": "quantity required"}, status=status.HTTP_400_BAD_REQUEST)
-        item = CartItem.objects.filter(pk=pk, cart__user=request.user).first()
-        if not item:
-            return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
-        qty = int(qty)
-        if qty <= 0:
-            item.delete()
-        else:
-            item.quantity = qty
+    @action(detail=False, methods=['delete'])
+    def clear(self, request):
+        cart = self.get_cart(request.user)
+        cart.items.all().delete()
+        return Response({"message": "Cart cleared"})
+
+
+class CartItemViewSet(viewsets.ModelViewSet):
+
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = CartItem.objects.all()
+
+        show_deleted = self.request.query_params.get('showDeleted')
+
+        if show_deleted:
+            queryset = CartItem.all_objects.all()
+
+        return queryset
+
+    def create(self, request):
+        product = request.data.get("product")
+        qty = int(request.data.get("quantity", 1))
+        cart_items_id = request.data.get("cart")
+
+        cart = Cart.objects.get(user=request.user)
+
+        item, created = CartItem.objects.get_or_create(
+            cart=cart_items_id,
+            product=product,
+            defaults={"quantity": qty}
+        )
+
+        if not created:
+            item.quantity += qty
             item.save()
-        return Response(CartSerializer(self.get_cart(request.user), context=self.get_serializer_context()).data)
+
+        return Response(
+            CartSerializer(cart, context=self.get_serializer_context()).data,
+            status=201
+        )
+
+    def partial_update(self, request, pk=None):
+        print("Entrou no partial_update do CartItemViewSet")
+        print("Request data:", request.data)
+
+        nova_quantidade = request.data.get("quantity")
+        if nova_quantidade is None:
+            return Response({"quantity": "Quantidade Invalida"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cart_item = CartItem.objects.get(pk=pk, cart__user=request.user)
+        except CartItem.DoesNotExist:
+            return Response({"error": "Item não encontrado no carrinho"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            nova_quantidade = int(nova_quantidade)
+        except (TypeError, ValueError):
+            return Response({"quantity": "Quantidade Invalida"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if nova_quantidade <= 0:
+            cart_item.delete()
+            cart = Cart.objects.filter(user=request.user).first()
+            serializer = CartSerializer(cart, context=self.get_serializer_context())
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        cart_item.quantity = nova_quantidade
+        cart_item.save()
+
+        cart = Cart.objects.get(user=request.user)
+        serializer = CartSerializer(cart, context=self.get_serializer_context())
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def destroy(self, request, pk=None):
         item = CartItem.objects.filter(pk=pk, cart__user=request.user).first()
@@ -149,11 +224,6 @@ class CartViewSet(viewsets.GenericViewSet):
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=['delete'])
-    def clear(self, request):
-        cart = self.get_cart(request.user)
-        cart.items.all().delete()
-        return Response({"message": "Cart cleared"})
 
 class CategoryViewSet(viewsets.ModelViewSet):
 

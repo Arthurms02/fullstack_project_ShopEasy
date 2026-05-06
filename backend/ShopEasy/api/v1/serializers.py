@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from rest_framework import serializers
 from ShopEasy.models import Cart, CartItem, Category, Product, Order, PaymentTransaction, OrderItem, User
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
@@ -66,7 +68,7 @@ class PaymentTransactionSerializer(serializers.ModelSerializer):
 
 class CartItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
-    product_id = serializers.IntegerField(write_only=True, required=False)
+    product_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = CartItem
@@ -86,7 +88,7 @@ class CartSerializer(serializers.ModelSerializer):
         return sum(i.quantity for i in obj.items.all())
 
     def get_total_price(self, obj):
-        return sum(int(i.quantity) * float(i.product.price) for i in obj.items.all())
+        return sum(int(i.quantity) * Decimal(i.product.price) for i in obj.items.all())
 
 
 
