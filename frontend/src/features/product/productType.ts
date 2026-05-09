@@ -1,5 +1,5 @@
 export type Product = {
-  id: number;
+  id: number | null;
   name: string;
   description: string;
   price: string; // o backend serializa Decimal como string — componentes usam parseFloat

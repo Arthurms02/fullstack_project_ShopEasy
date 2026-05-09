@@ -7,7 +7,6 @@ import { type RootState } from "../app/store";
 import { listAllProducts } from "../features/product/productAPI";
 import  { fetchProductsSuccess }  from "../features/product/productSlice";
 import { useEffect } from "react";
-import Header  from "../components/Header";
 
 
 const heroImage =
@@ -42,8 +41,6 @@ export default function Home() {
   };
 
   return (
-    <>
-    <Header />
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-orange-500 to-orange-600 overflow-hidden">
@@ -199,6 +196,5 @@ export default function Home() {
         </div>
       </section>
     </div>
-    </>
   );
 }

@@ -1,7 +1,6 @@
 
 
-export type HeaderProps = {
-    onSearch: (query: string) => void;
+export type NavBarProps = {
     isVendedor?: boolean;
     user?: {
         name: string;

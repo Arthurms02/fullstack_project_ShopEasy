@@ -42,7 +42,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        exclude = ['deleted_at']
+        exclude = ['deleted_at', 'created_at', 'updated_at']
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

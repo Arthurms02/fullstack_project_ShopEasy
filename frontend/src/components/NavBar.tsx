@@ -18,20 +18,14 @@ import {
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../app/store";
-import type { HeaderProps } from "../types/types";
-import api from "../app/api";
-import { useQuery } from "@tanstack/react-query";
 import { logout } from "../features/auth/authSlice";
 import { logoutRequest } from "../features/auth/authAPI";
 import { selectTotalItems } from "../features/cart/cartSlice";
 import Logo from "./Logo";
 
-const schema = yup.object().shape({
-  query: yup.string().optional(),
-});
-type SearchFormData = yup.InferType<typeof schema>;
 
-export default function Header({ onSearch }: HeaderProps) {
+
+export default function NavBar() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -53,7 +47,7 @@ export default function Header({ onSearch }: HeaderProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-  const [filtro, setFiltro] = useState("");
+  // const [filtro, setFiltro] = useState("");
 
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -65,25 +59,15 @@ export default function Header({ onSearch }: HeaderProps) {
     setMobileMenuOpen(false);
   };
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<SearchFormData>({
-    resolver: yupResolver<SearchFormData>(schema),
-    defaultValues: { query: "" },
-  });
-
-  const { data: produtosFiltrados } = useQuery({
-    queryKey: ["produtos", filtro],
-    queryFn: async () => {
-      if (!filtro) return [];
-      const { data } = await api.get(`/api/v1/products/?search=${encodeURIComponent(filtro)}`);
-      return data;
-    },
-    enabled: !!filtro,
-  });
+  // const { data: produtosFiltrados } = useQuery({
+  //   queryKey: ["produtos", filtro],
+  //   queryFn: async () => {
+  //     if (!filtro) return [];
+  //     const { data } = await api.get(`/api/v1/products/?search=${encodeURIComponent(filtro)}`);
+  //     return data;
+  //   },
+  //   enabled: !!filtro,
+  // });
 
   useEffect(() => {
     // fecha menu mobile quando muda rota
@@ -103,13 +87,6 @@ export default function Header({ onSearch }: HeaderProps) {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [mobileMenuOpen]);
 
-  const onSubmit = (data: SearchFormData) => {
-    const query = data.query?.trim() || "";
-    onSearch(query);
-    setFiltro(query);
-    reset({ query: "" });
-    setMobileSearchOpen(false);
-  };
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -121,7 +98,7 @@ export default function Header({ onSearch }: HeaderProps) {
           <Logo />
           {/* Desktop search */}
           <form
-            onSubmit={handleSubmit(onSubmit)}
+            // onSubmit={handleSubmit(onSubmit)}
             className="hidden md:flex flex-1 max-w-xl mx-6"
             role="search"
           >
@@ -129,7 +106,7 @@ export default function Header({ onSearch }: HeaderProps) {
               <input
                 type="text"
                 placeholder="Buscar produtos..."
-                {...register("query")}
+                // {...register("query")}
                 className="flex-1 px-4 py-2 outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
               />
               <button
@@ -271,12 +248,12 @@ export default function Header({ onSearch }: HeaderProps) {
         {/* Mobile search */}
         {mobileSearchOpen && (
           <div className="md:hidden mt-2 mb-2">
-            <form onSubmit={handleSubmit(onSubmit)} className="px-2">
+            <form className="px-2">
               <div className="flex w-full border border-gray-300 rounded-lg overflow-hidden">
                 <input
                   type="text"
                   placeholder="Buscar produtos..."
-                  {...register("query")}
+                  // {...register("query")}
                   className="flex-1 px-4 py-2 outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
                 />
                 <button type="submit" className="bg-orange-500 hover:bg-orange-600 px-4 py-2 text-white transition-colors">

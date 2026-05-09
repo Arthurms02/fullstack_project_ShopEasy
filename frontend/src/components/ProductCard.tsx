@@ -48,7 +48,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   }[product.condition];
 
   return (
-    <Link to={`/produto/${product.id}`} className="group block">
+    <Link to={`/produtos/${product.id}`} className="group block">
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
         {/* Image */}
         <div className="relative aspect-[4/3] overflow-hidden bg-gray-50">

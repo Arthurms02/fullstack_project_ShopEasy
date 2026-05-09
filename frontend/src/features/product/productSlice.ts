@@ -24,9 +24,27 @@ const productSlice = createSlice({
       state.error = action.payload;
       state.isLoading = false;
     },
+    fetchProductByIdStart(state) {
+      state.isLoading = true;
+      state.error = null;
+    },
+    fetchProductByIdSuccess(state, action: PayloadAction<ProductState['products'][number]>) {
+      if(!action.payload) {
+        state.error = "Produto não encontrado";
+        state.isLoading = false;
+        return;
+      }
+      const index = state.products.findIndex(p => p.id === action.payload.id);
+      if (index !== -1) {
+        state.products[index] = action.payload;
+      } else {
+        state.products.push(action.payload);
+      }
+      state.isLoading = false;
+    }
   },
 });
 
-export const { fetchProductsStart, fetchProductsSuccess, fetchProductsFailure   } = productSlice.actions;
+export const { fetchProductsStart, fetchProductsSuccess, fetchProductsFailure, fetchProductByIdStart, fetchProductByIdSuccess } = productSlice.actions;
 
 export default productSlice.reducer;

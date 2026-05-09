@@ -82,6 +82,14 @@ class ProductViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    def retrieve(self, request, pk=None):
+        try:
+            product = Product.objects.get(pk=pk)
+            serializer = self.get_serializer(product)
+            return Response(serializer.data)
+        except Product.DoesNotExist:
+            return Response({'error': 'Produto não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
     @action(detail=True, methods=['post'])
     def restore(self, request,pk=None):
         """
