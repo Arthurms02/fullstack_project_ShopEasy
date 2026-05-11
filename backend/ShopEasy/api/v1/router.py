@@ -1,5 +1,5 @@
 from rest_framework.routers import DefaultRouter
-from ShopEasy.api.v1.viewsets import (CartItemViewSet, CartViewSet,
+from ShopEasy.api.v1.viewsets import (CartItemViewSet, CartViewSet, FavoriteViewSet,
                                        ProductViewSet,
                                        OrderViewSet,
                                        PaymentTransactionViewSet,
@@ -7,6 +7,7 @@ from ShopEasy.api.v1.viewsets import (CartItemViewSet, CartViewSet,
                                          LogoutViewSet, RegisterViewSet, UserViewSet)
 
 router = DefaultRouter()
+router.register(r'favorites', FavoriteViewSet)
 router.register(r'logout', LogoutViewSet, basename='logout')
 router.register(r'cart', CartViewSet, basename='cart')
 router.register(r'users', UserViewSet)

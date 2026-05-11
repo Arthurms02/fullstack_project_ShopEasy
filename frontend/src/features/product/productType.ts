@@ -1,3 +1,5 @@
+import type { User } from '../auth/authType';
+
 export type Product = {
   id: number | null;
   name: string;
@@ -7,11 +9,13 @@ export type Product = {
   image_url?: string | null;
   created_at?: string;
   updated_at?: string;
+  isFavorite?: boolean; // campo extra para controle local de favoritos
 }
 
 export type ProductState = {
   products: Product[];
   isLoading: boolean;
+  isFavorite: boolean;
   error: string | null;
 }
 
@@ -21,5 +25,10 @@ export type ListParams = {
   [k: string]: any };
 
 export type ProductCardProps = {
+  product: Product;
+}
+
+export type ProductFavorite = {
+  user: User;
   product: Product;
 }

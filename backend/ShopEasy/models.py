@@ -20,6 +20,9 @@ class BaseModel(models.Model):
         self.deleted_at = timezone.now()
         self.save()
 
+    def hard_delete(self, using=None, keep_parents=False):
+        super().delete(using=using, keep_parents=keep_parents)
+
     def restore(self):
         self.deleted_at = None
         self.save()
@@ -123,10 +126,12 @@ class Cart(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
 
+
 class CartItem(BaseModel):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
+
 
 
 class PaymentTransaction(BaseModel):

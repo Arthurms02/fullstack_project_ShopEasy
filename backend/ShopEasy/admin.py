@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Product, Order, OrderItem, Cart, CartItem, PaymentTransaction
+from .models import Favorite, User, Product, Order, OrderItem, Cart, CartItem, PaymentTransaction
 
 
 @admin.register(Cart)
@@ -17,6 +17,17 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ('email', 'nome_completo', 'role', 'is_staff', 'created_at', 'updated_at')
     search_fields = ('email', 'nome_completo')
     list_filter = ('role', 'is_staff')
+
+    def get_exclude(self, request, obj=None):
+        # Oculta deleted_at ao criar novo objeto
+        if obj is None:
+            return ['deleted_at']
+        return []
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'created_at', 'updated_at', 'deleted_at')
+    search_fields = ('user__email', 'product__name')
 
     def get_exclude(self, request, obj=None):
         # Oculta deleted_at ao criar novo objeto

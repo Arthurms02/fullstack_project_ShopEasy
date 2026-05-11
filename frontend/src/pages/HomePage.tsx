@@ -1,12 +1,13 @@
 import { Link, useNavigate } from "react-router";
 import { Search, ArrowRight, Shield, Truck, Star, Zap, Loader2 } from "lucide-react";
 import { useState } from "react";
-import  ProductCard  from "../components/ProductCard";
-import { useDispatch ,useSelector } from "react-redux";
+import ProductCard from "../components/ProductCard";
+import { useDispatch, useSelector } from "react-redux";
 import { type RootState } from "../app/store";
-import { listAllProducts } from "../features/product/productAPI";
-import  { fetchProductsSuccess }  from "../features/product/productSlice";
 import { useEffect } from "react";
+import { listAllProducts, fetchFavorites } from "../features/product/productAPI";
+import { fetchProductsSuccess } from "../features/product/productSlice";
+import { toggleFavoriteInStore } from "../features/product/favoriteSlice";
 
 
 const heroImage =
@@ -17,21 +18,24 @@ export default function Home() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // ── React Query ────────────────────────────────────────────────────────────
-    const { isLoading } = useSelector((state: RootState) => state.products);
 
-    useEffect(() => {
-            (async () => {
-                try {
-                    const products = await listAllProducts();
-                    dispatch(fetchProductsSuccess(products));
-                } catch (e) {
-                    console.error("Falha ao carregar produtos:", e);
-                }
-            })();
-        }, [dispatch]);
+  const { isLoading } = useSelector((state: RootState) => state.products);
 
-    const allProducts = useSelector((state: RootState) => state.products.products);
+  useEffect(() => {
+    (async () => {
+      try {
+        const products = await listAllProducts();
+        dispatch(fetchProductsSuccess(products));
+        const favoriteIds = await fetchFavorites();
+        dispatch(toggleFavoriteInStore(favoriteIds));
+
+      } catch (e) {
+        console.error("Falha ao carregar produtos:", e);
+      }
+    })();
+  }, [dispatch]);
+
+  const allProducts = useSelector((state: RootState) => state.products.products);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

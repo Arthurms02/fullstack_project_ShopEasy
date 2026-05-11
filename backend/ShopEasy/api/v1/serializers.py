@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from rest_framework import serializers
-from ShopEasy.models import Cart, CartItem, Category, Product, Order, PaymentTransaction, OrderItem, User
+from ShopEasy.models import Cart, CartItem, Category, Favorite, Product, Order, PaymentTransaction, OrderItem, User
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
 
@@ -40,6 +40,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
 class ProductSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Product
         exclude = ['deleted_at', 'created_at', 'updated_at']
@@ -64,6 +65,12 @@ class PaymentTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentTransaction
         exclude = ['deleted_at']
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favorite
+        fields = ['id', 'user', 'product']
+        read_only_fields = ['user']
 
 
 class CartItemSerializer(serializers.ModelSerializer):

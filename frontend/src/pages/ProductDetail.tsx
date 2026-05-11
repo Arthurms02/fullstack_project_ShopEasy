@@ -25,8 +25,6 @@ export default function ProductDetail() {
   const [wishlist, setWishlist] = useState(false);
   const [added, setAdded] = useState(false);
 
-  console.log("ID do produto:", id);
-
   // ── React Query ────────────────────────────────────────────────────────────
   const {  isLoading, error } = useSelector((state: RootState) => state.products) ;
   const product = id ? useSelector((state: RootState) => state.products.products.find(p => p.id === Number(id))) : null;

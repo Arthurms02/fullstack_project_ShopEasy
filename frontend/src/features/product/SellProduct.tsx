@@ -89,8 +89,7 @@ export default function Sell() {
   };
 
   const onSubmit = (data: FormValues) => {
-    // Payload que seria enviado para POST /products
-    console.log("POST /products →", data);
+    // Payload que seria enviado para POST /product
     createProduct(data);
     setSubmitted(true);
     setTimeout(() => navigate("/"), 3000);

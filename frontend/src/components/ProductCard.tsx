@@ -1,18 +1,29 @@
 import { Link } from "react-router";
 import { Star, MapPin, ShoppingCart, Heart } from "lucide-react";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { ProductCardProps } from "../features/product/productType";
 import { addToCart } from "../features/cart/cartSlice";
 import { addToCartApi } from "../features/cart/cartAPI";
+import { toggleFavorite } from "../features/product/productAPI";
+import { getProductFavoriteToggle } from "../features/product/productSlice";
+import { useEffect } from "react";
+import type { RootState } from "../app/store";
 
 
 
 
 export default function ProductCard({ product }: ProductCardProps) {
+
   const dispatch = useDispatch();
-  const [wishlist, setWishlist] = useState(false);
+  const isfavoriteInStore = useSelector((state: RootState) => state.favorites.items?.includes(product.id));
   const [added, setAdded] = useState(false);
+  const [favorite, setFavorite] = useState(isfavoriteInStore);
+
+  useEffect(() => {
+    setFavorite(isfavoriteInStore);
+  }, [isfavoriteInStore]);
+
 
   const discount = product.price
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -21,24 +32,32 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("Adicionando ao carrinho:", product);
     dispatch(addToCart(product));
-    try{
-      const response = await addToCartApi(product);
-      console.log("Resposta da API:", response);
+    try {
 
-    }catch (error) {
+      await addToCartApi(product, 1);
+
+    } catch (error) {
       console.error("Erro ao adicionar ao carrinho:", error);
     }
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };
 
-
-  const handleWishlist = (e: React.MouseEvent) => {
+  const handleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setWishlist(!wishlist);
+    const previousFavorite = favorite;
+    setFavorite(!previousFavorite); // Atualiza o estado local imediatamente para feedback visual
+
+    try {
+      console.log("Toggling favorite para productId:", product.id, "isFavorite:", !previousFavorite);
+      await toggleFavorite(product.id!, !previousFavorite);
+      // dispatch(getProductFavoriteToggle({ productId: product.id!, isFavorite: !previousFavorite }));
+    } catch (error) {
+      console.error("Erro ao atualizar lista de favoritos:", error);
+      setFavorite(previousFavorite); // Reverte o estado local em caso de erro
+    }
   };
 
   const conditionColor = {
@@ -67,7 +86,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
           >
             <Heart
-              className={`w-4 h-4 ${wishlist ? "fill-red-500 text-red-500" : "text-gray-400"}`}
+              className={`w-4 h-4 ${favorite ? "fill-red-500 text-red-500" : "text-gray-400"}`}
             />
           </button>
           <span className={`absolute bottom-2 left-2 text-xs px-2 py-0.5 rounded-full font-medium ${conditionColor}`}>
@@ -111,8 +130,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           <button
             onClick={handleAddToCart}
             className={`w-full py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all ${added
-                ? "bg-green-500 text-white"
-                : "bg-orange-500 hover:bg-orange-600 text-white"
+              ? "bg-green-500 text-white"
+              : "bg-orange-500 hover:bg-orange-600 text-white"
               }`}
           >
             <ShoppingCart className="w-4 h-4" />

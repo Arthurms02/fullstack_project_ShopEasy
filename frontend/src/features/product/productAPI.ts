@@ -2,13 +2,10 @@ import api from '../../app/api';
 import type { Product } from './productType';
 import type { ListParams }  from './productType';
 
+
 const BASE = '/api/v1/products/';
 
-
-/**
- * Faz paginação automática se a resposta for paginada (DRF padrão).
- * Retorna um array de `Product`.
- */
+// Verificar a necessidade de paginação: se a API suporta paginação, implementar lógica para lidar com múltiplas páginas
 export async function listAllProducts(params?: ListParams): Promise<Product[]> {
   const results: Product[] = [];
   let page = 1;
@@ -57,8 +54,26 @@ export async function deleteProduct(id: number): Promise<void> {
 
 export async function restoreProduct(id: number): Promise<Product> {
   const { data } = await api.post(`${BASE}${id}/restore/`);
-  // o backend retorna { message, data: <produto> } para restore
   return data.data ?? data;
+}
+
+export async function fetchFavorites(): Promise<number[]> {
+  const res = await api.get('/api/v1/favorites/');
+  const listID: number[] = [];
+  console.log("Resposta da API de favoritos:", res.data.results);
+
+  for (const item of res.data.results) {
+    listID.push(item.id );
+  }
+  return listID;
+}
+
+export async function toggleFavorite(productId: number, isFavorite: boolean): Promise<void> {
+  console.log("Toggling favorite for productId:", productId, "isFavorite:", isFavorite);
+  if (isFavorite) {
+    console.log("Adicionando aos favoritos:", productId);
+    await api.post('/api/v1/favorites/', { product: productId });
+  }
 }
 
 export default {
@@ -68,4 +83,5 @@ export default {
   updateProduct,
   deleteProduct,
   restoreProduct,
+  toggleFavorite
 };

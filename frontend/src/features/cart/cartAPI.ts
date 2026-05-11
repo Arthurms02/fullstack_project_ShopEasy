@@ -6,8 +6,8 @@ export async function fetchCart() {
   return res.data; // { id, user, items: [...] }
 }
 
-export async function addToCartApi(product: Product) {
-  const res = await api.post('/api/v1/cart-items/', { product: product });
+export async function addToCartApi(product: Product, quantity: number) {
+  const res = await api.post('/api/v1/cart-items/', { product: product.id, quantity: quantity });
   return res.data;
 }
 

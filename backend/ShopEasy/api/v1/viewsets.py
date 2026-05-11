@@ -2,9 +2,9 @@
 from rest_framework import viewsets, status, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from ShopEasy.models import CartItem, Category, Product, Order, PaymentTransaction, OrderItem, User, Cart
+from ShopEasy.models import CartItem, Category, Favorite, Product, Order, PaymentTransaction, OrderItem, User, Cart
 from ShopEasy.api.v1.serializers import (CartItemSerializer, CartSerializer, CategorySerializer,
-                                         CookieTokenRefreshSerializer, ProductSerializer, OrderSerializer,
+                                         CookieTokenRefreshSerializer, FavoriteSerializer, ProductSerializer, OrderSerializer,
                                            PaymentTransactionSerializer,
                                          OrderItemSerializer, RegisterSerializer, UserSerializer)
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -173,14 +173,17 @@ class CartItemViewSet(viewsets.ModelViewSet):
         return queryset
 
     def create(self, request):
-        product = request.data.get("product")
+
+        product_id = request.data.get("product")
+
+        product = Product.objects.get(id=product_id)
+
         qty = int(request.data.get("quantity", 1))
-        cart_items_id = request.data.get("cart")
 
         cart = Cart.objects.get(user=request.user)
 
         item, created = CartItem.objects.get_or_create(
-            cart=cart_items_id,
+            cart=cart,
             product=product,
             defaults={"quantity": qty}
         )
@@ -238,6 +241,42 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
+
+
+class FavoriteViewSet(viewsets.ModelViewSet):
+
+    queryset = Favorite.objects.all()
+    serializer_class = FavoriteSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Favorite.objects.filter(user=user)
+
+    def get_serializer_context(self):
+        return {"request": self.request}
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        product_id = request.data.get("product")
+        user = request.user
+
+        favorito, created = Favorite.all_objects.get_or_create(user=user, product_id=product_id)
+
+        if not created:
+            favorito.delete()
+            return Response({'isFavorite': False}, status=status.HTTP_200_OK)
+
+        return Response({'isFavorite': True}, status=status.HTTP_201_CREATED)
+
+    # def destroy(self, request, pk=None):
+    #     favorite = Favorite.all_objects.filter(pk=pk, user=request.user).first()
+    #     if not favorite:
+    #         return Response({"error": "Favorito não encontrado"}, status=status.HTTP_404_NOT_FOUND)
+    #     favorite.hard_delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class OrderItemViewSet(viewsets.ModelViewSet):
