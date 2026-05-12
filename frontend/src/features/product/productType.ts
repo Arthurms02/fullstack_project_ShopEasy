@@ -4,12 +4,10 @@ export type Product = {
   id: number | null;
   name: string;
   description: string;
-  price: string; // o backend serializa Decimal como string — componentes usam parseFloat
+  price: string;
   stock: number;
   image_url?: string | null;
-  created_at?: string;
-  updated_at?: string;
-  isFavorite?: boolean; // campo extra para controle local de favoritos
+  condition?: string;
 }
 
 export type ProductState = {

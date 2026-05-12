@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { SlidersHorizontal, X, ChevronDown, Loader2, Package } from "lucide-react";
 import  ProductCard  from "../components/ProductCard";
-import { useSelector } from "react-redux";
+import { useDispatch ,useSelector } from "react-redux";
+import { fetchProductsSuccess } from "../features/product/productSlice";
+import { listAllProducts } from "../features/product/productAPI";
+import type { RootState } from "../app/store";
 
 
 type SortOption = "relevance" | "price-asc" | "price-desc" | "stock-desc";
@@ -13,13 +16,26 @@ export default function Products() {
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [onlyInStock, setOnlyInStock] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+      (async () => {
+        try {
+          const products = await listAllProducts();
+          dispatch(fetchProductsSuccess(products));
+
+        } catch (e) {
+          console.error("Falha ao carregar produtos:", e);
+        }
+      })();
+    }, [dispatch]);
 
   const query = searchParams.get("q") || "";
 
   // ── React Query ────────────────────────────────────────────────────────────
-  const { data: allProducts = [], isLoading, isError } = useSelector((state: any) => state.products);
+  const { products , isLoading, error } = useSelector((state: RootState) => state.products);
 
-  const filteredProducts = allProducts
+  const filteredProducts = products
     .filter((p) => {
       if (query) {
         const q = query.toLowerCase();
@@ -169,7 +185,7 @@ export default function Products() {
               <div className="flex items-center justify-center py-24">
                 <Loader2 className="w-8 h-8 text-orange-400 animate-spin" />
               </div>
-            ) : isError ? (
+            ) : error ? (
               <div className="flex flex-col items-center justify-center py-24 text-center">
                 <span className="text-5xl mb-4">⚠️</span>
                 <p className="text-gray-700 mb-2">Erro ao carregar produtos</p>

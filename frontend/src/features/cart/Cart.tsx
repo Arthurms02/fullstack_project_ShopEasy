@@ -9,8 +9,10 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { clearCart, removeFromCart, selectCartItems, selectTotalItems, selectTotalPrice, setCart, updateQuantity } from "./cartSlice";
+import { clearCart, removeFromCart, setCart, updateQuantity } from "./cartSlice";
 import { clearCartApi, fetchCart, removeFromCartApi, updateQuantityApi } from "./cartAPI";
+import type { CartItem } from "./cartType";
+import type { RootState } from "../../app/store";
 
 
 
@@ -21,9 +23,8 @@ export default function Cart() {
     const [coupon, setCoupon] = useState("");
     const [couponApplied, setCouponApplied] = useState(false);
 
-    const items = useSelector(selectCartItems);
-    const totalItems = useSelector(selectTotalItems);
-    const totalPrice = useSelector(selectTotalPrice);
+    const {items, totalItems, totalPrice } = useSelector((state: RootState ) => state.cart);
+
     const discount = couponApplied ? totalPrice * 0.1 : 0; // Exemplo: 10% de desconto
     const shipping = totalPrice - discount > 500 ? 0 : 20; // Frete grátis para pedidos acima de R$500
     const finalPrice = totalPrice - discount + shipping;
@@ -32,7 +33,7 @@ export default function Cart() {
         (async () => {
             try {
                 const cart = await fetchCart(); // { items: [{id, product, quantity}, ...] }
-                const mapped = (cart.items || []).map((i: any) => ({
+                const mapped = (cart.items || []).map((i: CartItem) => ({
                     id: i.id,
                     product: i.product,
                     quantity: i.quantity,
@@ -59,20 +60,14 @@ export default function Cart() {
 
     const handleUpdateQuantity = async (id: number, nova_quantidade: number) => {
 
-        console.log("Atualizando quantidade para produto"+ id + "nova quantidade:", nova_quantidade);
-
         updateQuantity({ id, quantity: nova_quantidade });
 
         try {
             const response = await updateQuantityApi(id, nova_quantidade);
-            const data = response.data;
-            console.log("Resposta da API:", response);
             if ( response ) {
-                console.log("DADOS QUE VIERAM DA API:", response);
                 // Normaliza: API pode retornar um array ou um objeto { items: [...] }
                 const itemsArr = Array.isArray(response) ? response : (response?.items ?? []);
-                console.log("Items extraídos da resposta:", itemsArr);
-                const mapped = itemsArr.map((i: any) => ({
+                const mapped = itemsArr.map((i: CartItem) => ({
                     id: i.id,
                     product: i.product,
                     quantity: Number(i.quantity) || 0,
@@ -83,7 +78,6 @@ export default function Cart() {
                 console.warn(response);
                 console.warn("A API respondeu, mas os dados vieram vazios.");
             }} catch (error: any) {
-            // Agora você verá o erro real aqui
             console.error("Erro capturado:", error.response?.data || error.message);
         }
     };
@@ -171,7 +165,7 @@ export default function Cart() {
                             >
                                 <Link to={`/produto/${product.id}`} className="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28">
                                     <img
-                                        src={product.image ?? product.image_url ?? "/placeholder.png"}
+                                        src={product.image_url ?? product.image_url ?? "/placeholder.png"}
                                         alt={product.name}
                                         className="w-full h-full object-cover rounded-md"
                                         loading="lazy"
@@ -202,14 +196,16 @@ export default function Cart() {
 
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
-                                            <button onClick={() => {
+                                            <button className="px-2.5 py-1.5 text-gray-600 hover:bg-gray-50 transition-colors text-sm"
+                                             onClick={() => {
                                                 const newQty = quantity - 1;
                                                 if (newQty <= 0) {
                                                     handleUpdateQuantity(id, 0);
                                                 } else {
                                                     handleUpdateQuantity(id, newQty);
                                                 }
-                                            }}>−</button>
+
+                                            }}> −</button>
                                             <span className="px-3 py-1.5 text-gray-900 text-sm font-medium">
                                                 {quantity}
                                             </span>
@@ -225,8 +221,8 @@ export default function Cart() {
                                             <p className="text-orange-600 font-semibold">
                                                 R$ {(product.price * quantity).toLocaleString("pt-BR")}
                                             </p>
-                                            {product.originalPrice != null && (
-                                                <p className="text-gray-400 text-xs line-through">R$ {(product.originalPrice * quantity).toLocaleString("pt-BR")}</p>
+                                            {product.price != null && (
+                                                <p className="text-gray-400 text-xs line-through">R$ {(product.price * quantity).toLocaleString("pt-BR")}</p>
                                             )}
                                         </div>
                                     </div>

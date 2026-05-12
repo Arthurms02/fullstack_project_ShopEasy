@@ -20,7 +20,6 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../app/store";
 import { logout } from "../features/auth/authSlice";
 import { logoutRequest } from "../features/auth/authAPI";
-import { selectTotalItems } from "../features/cart/cartSlice";
 import Logo from "./Logo";
 
 
@@ -30,7 +29,7 @@ export default function NavBar() {
   const location = useLocation();
   const dispatch = useDispatch();
   const auth = useSelector((state: RootState) => state.auth);
-  const totalItems = useSelector(selectTotalItems) ?? 0;
+  const totalItems = useSelector((state: RootState) => state.cart.totalItems);
 
   const isAuthenticated = auth.isAuthenticated ?? false;
   const isSeller = auth.role === "vendedor" || auth.role === "admin";

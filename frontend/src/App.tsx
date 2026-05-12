@@ -17,7 +17,6 @@ function AppContent() {
     return <div>Carregando sessão...</div>;
   }
 
-
     return (
         <BrowserRouter>
             <AppRoutes />
@@ -33,7 +32,7 @@ function App() {
     useEffect(() => {
         const checkSession = async () => {
             try {
-                // Tente acessar QUALQUER rota sua que precise de token
+                // Tente acessar uma rota protegida
                 const res = await api.get('/api/v1/users/me/'); // Exemplo de rota protegida
                 dispatch(loginSuccess(res.data));
             } catch (err) {
@@ -41,7 +40,6 @@ function App() {
                 dispatch(loginFailure("Usuário não autenticado"));
             }
         };
-
         checkSession();
     }, [dispatch]);
 

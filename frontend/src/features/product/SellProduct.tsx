@@ -41,6 +41,10 @@ const schema = yup.object({
     .string()
     .url("Informe uma URL válida (ex: https://...)")
     .required("URL da imagem é obrigatória"),
+  condition: yup
+    .string()
+    .oneOf(["Novo", "Seminovo", "Usado"], "Condição deve ser: Novo, Seminovo ou Usado")
+    .required("Condição é obrigatória"),
 });
 
 type FormValues = yup.InferType<typeof schema>;
@@ -49,7 +53,7 @@ type FormValues = yup.InferType<typeof schema>;
 const STEP_FIELDS: Record<number, (keyof FormValues)[]> = {
   1: ["name", "price", "stock"],
   2: ["description"],
-  3: ["image_url"],
+  3: ["image_url", "condition"],
 };
 
 
@@ -57,13 +61,12 @@ export default function Sell() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
-  const [apiPreview, setApiPreview] = useState(false);
 
   const {
     register,
     handleSubmit,
-    trigger,
-    watch,
+    trigger, // Permite validar campos específicos antes de avançar para o próximo step (Retorna uma Promise<boolean>)
+    watch,  // Permite observar os valores dos campos para pré-visualização e contagem de caracteres(Retornas o valor do campo)
     formState: { errors },
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
@@ -73,6 +76,7 @@ export default function Sell() {
       price: "",
       stock: undefined,
       image_url: "",
+      condition: "Novo",
     },
     mode: "onChange",
   });
@@ -82,6 +86,7 @@ export default function Sell() {
   const priceValue = watch("price") ?? "";
   const stockValue = watch("stock");
   const imageUrlValue = watch("image_url") ?? "";
+  const conditionValue = watch("condition") ?? "Novo";
 
   const nextStep = async () => {
     const valid = await trigger(STEP_FIELDS[step] as any);
@@ -363,6 +368,36 @@ export default function Sell() {
                   </p>
                 </div>
               )}
+              {/* Condição do produto */}
+              {conditionValue && !errors.condition && (
+                <div className="mt-2">
+                  <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${
+                    conditionValue === "Novo"
+                      ? "bg-green-100 text-green-700"
+                      : conditionValue === "Seminovo"
+                      ? "bg-blue-100 text-blue-700"
+                      : "bg-gray-100 text-gray-600"
+                  }`}>
+                    {conditionValue}
+                  </span>
+                </div>
+              )}
+              <div>
+                <label className="block text-sm text-gray-700 mb-1.5">
+                  Condição *
+                </label>
+                <select
+                  {...register("condition")}
+                  className={inputClass(!!errors.condition)}
+                >
+                  <option value="Novo">Novo</option>
+                  <option value="Seminovo">Seminovo</option>
+                  <option value="Usado">Usado</option>
+                </select>
+                {errors.condition && (
+                  <p className="text-red-500 text-xs mt-1">{errors.condition.message}</p>
+                )}
+              </div>
 
               {/* Pré-visualização do anúncio */}
               <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
@@ -394,32 +429,6 @@ export default function Sell() {
                   </div>
                 </div>
               </div>
-
-              {/* API payload preview */}
-              <button
-                type="button"
-                onClick={() => setApiPreview((v) => !v)}
-                className="text-xs text-gray-400 hover:text-gray-600 underline"
-              >
-                {apiPreview ? "Ocultar" : "Ver"} payload da API
-              </button>
-              {apiPreview && (
-                <div className="bg-gray-900 rounded-xl p-4">
-                  <pre className="text-green-400 text-xs overflow-x-auto">
-                    {JSON.stringify(
-                      {
-                        name: nameValue,
-                        description: descriptionValue,
-                        price: priceValue,
-                        stock: stockValue ?? 0,
-                        image_url: imageUrlValue,
-                      },
-                      null,
-                      2
-                    )}
-                  </pre>
-                </div>
-              )}
 
               <div className="flex gap-3">
                 <button

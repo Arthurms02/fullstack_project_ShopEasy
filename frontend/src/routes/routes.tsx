@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { type RootState } from "../app/store";
 import Loading from "../components/Loading";
 import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
 
 const LoginPage = lazy(() => import("../pages/LoginPage"));
 const RegisterPage = lazy(() => import("../pages/RegisterPage"));
@@ -12,6 +13,7 @@ const SellerPage = lazy(() => import("../features/product/SellProduct"));
 const CartPage = lazy(() => import("../features/cart/Cart"));
 const ProductPage = lazy(() => import("../pages/ProductPage"));
 const ProductDetail = lazy(() => import("../pages/ProductDetail"));
+
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
     const { isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
@@ -38,6 +40,7 @@ function AppLayout() {
         <>
             <NavBar />
             <Outlet />
+            <Footer />
         </>
     );
 }

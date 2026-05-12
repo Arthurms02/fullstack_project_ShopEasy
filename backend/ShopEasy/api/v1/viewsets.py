@@ -410,7 +410,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 httponly=True,
                 secure=settings.SECURE_COOKIE,
                 samesite="Lax",  # ou 'Strict' conforme necessidade
-                max_age=3600,
+                max_age=86400,  # 1 dia
                 path="/"
             )
 

@@ -6,7 +6,6 @@ import type { ProductCardProps } from "../features/product/productType";
 import { addToCart } from "../features/cart/cartSlice";
 import { addToCartApi } from "../features/cart/cartAPI";
 import { toggleFavorite } from "../features/product/productAPI";
-import { getProductFavoriteToggle } from "../features/product/productSlice";
 import { useEffect } from "react";
 import type { RootState } from "../app/store";
 
@@ -20,14 +19,15 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [added, setAdded] = useState(false);
   const [favorite, setFavorite] = useState(isfavoriteInStore);
 
-  useEffect(() => {
-    setFavorite(isfavoriteInStore);
-  }, [isfavoriteInStore]);
 
+  const generateRandomDiscount = (productId: number): number => {
+  // Usa o ID como seed para gerar sempre o mesmo desconto
+  const seed = productId * 9301 + 49297;
+  const random = (seed % 233280) / 233280;
+  return Math.round(random * 80); // 0-80%
+  };
 
-  const discount = product.price
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : 0;
+  const discount = generateRandomDiscount(product.id!);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -64,7 +64,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     Novo: "bg-green-100 text-green-700",
     Seminovo: "bg-blue-100 text-blue-700",
     Usado: "bg-gray-100 text-gray-600",
-  }[product.condition];
+  }[product.condition ?? 'Novo'] || "bg-gray-100 text-gray-600";
 
   return (
     <Link to={`/produtos/${product.id}`} className="group block">

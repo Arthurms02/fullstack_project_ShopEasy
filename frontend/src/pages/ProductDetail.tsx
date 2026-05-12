@@ -20,20 +20,20 @@ import type { RootState } from "../app/store";
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-//   const { addToCart } = useCart();
+  // const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [wishlist, setWishlist] = useState(false);
   const [added, setAdded] = useState(false);
 
   // ── React Query ────────────────────────────────────────────────────────────
   const {  isLoading, error } = useSelector((state: RootState) => state.products) ;
-  const product = id ? useSelector((state: RootState) => state.products.products.find(p => p.id === Number(id))) : null;
+  const product = useSelector((state: RootState) => state.products.products.find(p => p.id === Number(id)));
   const { products } = useSelector((state: RootState) => state.products);
   console.log("Produtos no estado:", products);
 
   // Produtos relacionados: outros da lista excluindo o atual
   const related = products
-    ? products.filter((p) => p.id !== product.id).slice(0, 4)
+    ? products.filter((p) => p.id !== product?.id).slice(0, 4)
     : [];
 
   // ── States ─────────────────────────────────────────────────────────────────
@@ -59,9 +59,9 @@ export default function ProductDetail() {
     );
   }
 
-  const price = parseFloat(product.price);
-  const inStock = product.stock > 0;
-  const lowStock = product.stock > 0 && product.stock <= 3;
+  const price = parseFloat(product?.price || "0");
+  const inStock = product?.stock > 0;
+  const lowStock = product?.stock > 0 && product?.stock <= 3;
 
   const handleAddToCart = () => {
     if (!inStock) return;
@@ -91,7 +91,7 @@ export default function ProductDetail() {
           <span>/</span>
           <Link to="/produtos" className="hover:text-gray-700">Produtos</Link>
           <span>/</span>
-          <span className="text-gray-700 truncate max-w-[200px]">{product.name}</span>
+          <span className="text-gray-700 truncate max-w-[200px]">{product?.name}</span>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 mb-12">
@@ -99,8 +99,8 @@ export default function ProductDetail() {
           <div className="relative">
             <div className="aspect-square rounded-2xl overflow-hidden bg-white border border-gray-200 shadow-sm">
               <img
-                src={product.image_url}
-                alt={product.name}
+                src={product?.image_url}
+                alt={product?.name}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -121,7 +121,7 @@ export default function ProductDetail() {
 
           {/* Info */}
           <div>
-            <h1 className="text-gray-900 mb-4 text-2xl">{product.name}</h1>
+            <h1 className="text-gray-900 mb-4 text-2xl">{product?.name}</h1>
 
             {/* Stock status */}
             <div className="flex items-center gap-2 mb-4">
@@ -133,12 +133,12 @@ export default function ProductDetail() {
               ) : lowStock ? (
                 <span className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 text-xs px-3 py-1.5 rounded-full font-medium">
                   <Package className="w-3.5 h-3.5" />
-                  Últimas {product.stock} unidades
+                  Últimas {product?.stock} unidades
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 bg-green-50 text-green-700 border border-green-200 text-xs px-3 py-1.5 rounded-full font-medium">
                   <Package className="w-3.5 h-3.5" />
-                  {product.stock} em estoque
+                  {product?.stock} em estoque
                 </span>
               )}
             </div>
@@ -177,14 +177,14 @@ export default function ProductDetail() {
                     {quantity}
                   </span>
                   <button
-                    onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                    onClick={() => setQuantity(Math.min(product?.stock || 0, quantity + 1))}
                     className="px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors"
                   >
                     +
                   </button>
                 </div>
                 <span className="text-gray-400 text-xs">
-                  máx. {product.stock} un.
+                  máx. {product?.stock} un.
                 </span>
               </div>
             )}
@@ -231,27 +231,7 @@ export default function ProductDetail() {
         {/* Description */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-10">
           <h2 className="text-gray-900 mb-4">Descrição do Produto</h2>
-          <p className="text-gray-600 text-sm leading-relaxed">{product.description}</p>
-
-          {/* API raw */}
-          <details className="mt-6 bg-gray-900 rounded-xl p-4">
-            <summary className="text-gray-400 text-xs cursor-pointer hover:text-gray-200 select-none">
-              📦 Corpo da API (JSON)
-            </summary>
-            <pre className="text-green-400 text-xs mt-3 overflow-x-auto">
-              {JSON.stringify(
-                {
-                  name: product.name,
-                  description: product.description,
-                  price: product.price,
-                  stock: product.stock,
-                  image_url: product.image_url,
-                },
-                null,
-                2
-              )}
-            </pre>
-          </details>
+          <p className="text-gray-600 text-sm leading-relaxed">{product?.description}</p>
         </div>
 
         {/* Related products */}
