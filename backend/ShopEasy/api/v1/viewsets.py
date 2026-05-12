@@ -71,6 +71,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
+    search_fields = ['name', 'description']
 
     def get_queryset(self):
         queryset = Product.objects.all()
