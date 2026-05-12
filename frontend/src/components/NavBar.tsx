@@ -75,10 +75,17 @@ export default function NavBar() {
     setUserMenuOpen(false);
   }, [location.pathname]);
 
+
   // fecha mobile menu ao clicar fora
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
+      const target = e.target as Element;
+      // Se o menu existe, o clique não foi dentro dele, E não foi no botão de abrir
+      if (
+        mobileMenuRef.current && 
+        !mobileMenuRef.current.contains(target) &&
+        !target.closest('#mobile-menu-btn')
+      ) {
         setMobileMenuOpen(false);
       }
     }
@@ -217,11 +224,12 @@ export default function NavBar() {
             </div>
 
             {/* Mobile controls */}
+            {/* Mobile controls */}
             <div className="flex md:hidden items-center gap-2">
               <Link to="/carrinho" className="relative p-2 text-gray-600 hover:text-gray-900">
-                <ShoppingCart className="w-5 h-5" />
+                <ShoppingCart className="w-5 h-5 pointer-events-none" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium pointer-events-none">
                     {totalItems > 9 ? "9+" : totalItems}
                   </span>
                 )}
@@ -232,15 +240,16 @@ export default function NavBar() {
                 className="p-2 text-gray-600 hover:text-gray-900"
                 aria-label="Buscar"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-5 h-5 pointer-events-none" />
               </button>
 
               <button
+                id="mobile-menu-btn"
                 onClick={() => setMobileMenuOpen((s) => !s)}
                 className="p-2 text-gray-600 hover:text-gray-900"
                 aria-label="Abrir menu"
               >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {mobileMenuOpen ? <X className="w-5 h-5 pointer-events-none" /> : <Menu className="w-5 h-5 pointer-events-none" />}
               </button>
             </div>
           </div>
@@ -248,12 +257,9 @@ export default function NavBar() {
 
         {/* Mobile search */}
         {mobileSearchOpen && (
-          <div className="md:hidden mt-2 mb-2">
-            {/* Mobile search */}
-        {mobileSearchOpen && (
-          <div className="md:hidden mt-2 mb-2">
-            <form onSubmit={handleSearch} className="px-2">
-              <div className="flex w-full border border-gray-300 rounded-lg overflow-hidden">
+          <div className="md:hidden mt-2 mb-2 px-2">
+            <form onSubmit={handleSearch}>
+              <div className="flex w-full border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-orange-400">
                 <input
                   type="text"
                   placeholder="Buscar produtos..."
@@ -266,8 +272,6 @@ export default function NavBar() {
                 </button>
               </div>
             </form>
-          </div>
-        )}
           </div>
         )}
 
