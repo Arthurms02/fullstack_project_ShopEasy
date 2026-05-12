@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
+
+import { loginRequest } from '../services/auth'
 
 export default function Login() {
-  const { login } = useAuth()
-
   const navigate = useNavigate()
 
   const [email, setEmail] = useState('')
@@ -13,9 +12,14 @@ export default function Login() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
-    await login(email, password)
+    try {
+      await loginRequest(email, password)
 
-    navigate('/')
+      navigate('/')
+    } catch (error) {
+      console.error(error)
+      alert('Erro ao fazer login')
+    }
   }
 
   return (
