@@ -60,10 +60,13 @@ export async function restoreProduct(id: number): Promise<Product> {
 export async function fetchFavorites(): Promise<number[]> {
   const res = await api.get('/api/v1/favorites/');
   const listID: number[] = [];
-  console.log("Resposta da API de favoritos:", res.data.results);
 
-  for (const item of res.data.results) {
-    listID.push(item.id );
+  // Pega o .results se tiver paginação, ou res.data direto se for uma lista simples
+  const data = res.data.results || res.data;
+
+  for (const item of data) {
+    // Pega o ID do produto (algumas APIs enviam como item.product, outras como item.id)
+    listID.push(item.product || item.id); 
   }
   return listID;
 }

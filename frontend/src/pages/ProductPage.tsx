@@ -1,8 +1,10 @@
-import { useState } from "react";
+import {useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { SlidersHorizontal, X, ChevronDown, Loader2, Package } from "lucide-react";
 import  ProductCard  from "../components/ProductCard";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch} from "react-redux";
+import { listAllProducts } from "../features/product/productAPI";
+import { fetchProductsSuccess } from "../features/product/productSlice";
 
 
 type SortOption = "relevance" | "price-asc" | "price-desc" | "stock-desc";
@@ -15,9 +17,13 @@ export default function Products() {
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const query = searchParams.get("q") || "";
+  
+
+  
+  
 
   // ── React Query ────────────────────────────────────────────────────────────
-  const { data: allProducts = [], isLoading, isError } = useSelector((state: any) => state.products);
+  const { products: allProducts = [], isLoading, error: isError } = useSelector((state: any) => state.products);
 
   const filteredProducts = allProducts
     .filter((p) => {
@@ -52,6 +58,17 @@ export default function Products() {
     setSortBy("relevance");
     setSearchParams({});
   };
+
+  const dispatch = useDispatch();
+
+useEffect(() => {
+  if (allProducts.length === 0) {
+    listAllProducts()
+      .then((res) => dispatch(fetchProductsSuccess(res)))
+      .catch(console.error);
+  }
+}, [dispatch, allProducts.length]);
+  
 
   const hasFilters =
     priceRange.min || priceRange.max || onlyInStock || query;

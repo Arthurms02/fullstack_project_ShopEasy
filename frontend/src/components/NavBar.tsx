@@ -47,9 +47,17 @@ export default function NavBar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-  // const [filtro, setFiltro] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault(); 
+    if (searchQuery.trim()) {
+      navigate(`/produtos?q=${encodeURIComponent(searchQuery.trim())}`);
+      setMobileSearchOpen(false); // fecha a barra se estiver no celular
+    }
+  };
 
   const handleLogout = async () => {
     setUserMenuOpen(false);
@@ -59,15 +67,6 @@ export default function NavBar() {
     setMobileMenuOpen(false);
   };
 
-  // const { data: produtosFiltrados } = useQuery({
-  //   queryKey: ["produtos", filtro],
-  //   queryFn: async () => {
-  //     if (!filtro) return [];
-  //     const { data } = await api.get(`/api/v1/products/?search=${encodeURIComponent(filtro)}`);
-  //     return data;
-  //   },
-  //   enabled: !!filtro,
-  // });
 
   useEffect(() => {
     // fecha menu mobile quando muda rota
@@ -97,8 +96,9 @@ export default function NavBar() {
           {/* Logo */}
           <Logo />
           {/* Desktop search */}
+          {/* Desktop search */}
           <form
-            // onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSearch}
             className="hidden md:flex flex-1 max-w-xl mx-6"
             role="search"
           >
@@ -106,7 +106,8 @@ export default function NavBar() {
               <input
                 type="text"
                 placeholder="Buscar produtos..."
-                // {...register("query")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 px-4 py-2 outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
               />
               <button
@@ -248,12 +249,16 @@ export default function NavBar() {
         {/* Mobile search */}
         {mobileSearchOpen && (
           <div className="md:hidden mt-2 mb-2">
-            <form className="px-2">
+            {/* Mobile search */}
+        {mobileSearchOpen && (
+          <div className="md:hidden mt-2 mb-2">
+            <form onSubmit={handleSearch} className="px-2">
               <div className="flex w-full border border-gray-300 rounded-lg overflow-hidden">
                 <input
                   type="text"
                   placeholder="Buscar produtos..."
-                  // {...register("query")}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1 px-4 py-2 outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
                 />
                 <button type="submit" className="bg-orange-500 hover:bg-orange-600 px-4 py-2 text-white transition-colors">
@@ -261,6 +266,8 @@ export default function NavBar() {
                 </button>
               </div>
             </form>
+          </div>
+        )}
           </div>
         )}
 
