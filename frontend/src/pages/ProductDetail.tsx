@@ -85,6 +85,7 @@ export default function ProductDetail() {
     if (!inStock) return;
     for (let i = 0; i < quantity; i++) addToCart(product);
     setAdded(true);
+    addToCart(product!);
     setTimeout(() => setAdded(false), 2000);
   };
 

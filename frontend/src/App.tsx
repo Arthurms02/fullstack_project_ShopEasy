@@ -31,7 +31,6 @@ function AppContent() {
 function App() {
 
   const dispatch = useDispatch();
-  // const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
         const checkSession = async () => {
@@ -50,20 +49,6 @@ function App() {
         };
         checkSession();
     }, [dispatch]);
-
-  //    useEffect(() => {
-  //   if (isAuthenticated) {
-  //     const loadFavorites = async () => {
-  //       try {
-  //         const favoriteIds = await fetchFavorites();
-  //         dispatch(setFavoritesList(favoriteIds));
-  //       } catch (error) {
-  //         console.error("Erro ao carregar favoritos:", error);
-  //       }
-  //     };
-  //     loadFavorites();
-  //   }
-  // }, [isAuthenticated, dispatch]);
 
   return (
     <QueryClientProvider client={queryClient}>

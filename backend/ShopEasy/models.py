@@ -136,11 +136,18 @@ class Cart(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
 
+    def __str__(self):
+        return f"Cart of {self.user.nome_completo}"
+
+
 
 class CartItem(BaseModel):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"CartItem {self.id} - {self.product.name} (Cart of {self.cart.user.nome_completo})"
 
 
 
