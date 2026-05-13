@@ -37,7 +37,7 @@ export default function Home() {
 
   const allProducts = useSelector((state: RootState) => state.products.products);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const eventoDeBusca = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/produtos?q=${encodeURIComponent(searchQuery.trim())}`);
@@ -68,7 +68,7 @@ export default function Home() {
             </p>
 
             <form
-              onSubmit={handleSearch}
+              onSubmit={eventoDeBusca}
               className="flex max-w-lg mx-auto bg-white rounded-xl overflow-hidden shadow-lg"
             >
               <input
