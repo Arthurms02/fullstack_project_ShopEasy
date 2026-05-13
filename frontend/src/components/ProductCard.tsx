@@ -1,12 +1,11 @@
 import { Link } from "react-router";
-import { Star, MapPin, ShoppingCart, Heart } from "lucide-react";
+import { ShoppingCart, Heart } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { ProductCardProps } from "../features/product/productType";
 import { addToCart } from "../features/cart/cartSlice";
 import { addToCartApi } from "../features/cart/cartAPI";
 import { toggleFavorite } from "../features/product/productAPI";
-import { useEffect } from "react";
 import type { RootState } from "../app/store";
 
 
@@ -103,29 +102,21 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           {/* Price */}
           <div className="mb-2">
-            {product.originalPrice && (
+
               <p className="text-gray-400 text-xs line-through">
-                R$ {product.originalPrice.toLocaleString("pt-BR")}
+                R$ {Number((product.price * 1.2)).toLocaleString("pt-BR")}
               </p>
-            )}
             <p className="text-orange-600 font-semibold text-base">
-              R$ {product.price.toLocaleString("pt-BR")}
+              R$ {Number(product.price).toLocaleString("pt-BR")}
+            </p>
+            <p className="text-gray-400 text-xs mt-0.5">
+              Em até 12x de R${" "}
+              {(product.price / 12).toLocaleString("pt-BR", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </p>
           </div>
-
-          {/* Rating */}
-          <div className="flex items-center gap-1 mb-2">
-            <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-            <span className="text-gray-700 text-xs font-medium">{product.rating}</span>
-            <span className="text-gray-400 text-xs">({product.reviews})</span>
-          </div>
-
-          {/* Location */}
-          <div className="flex items-center gap-1 mb-3">
-            <MapPin className="w-3 h-3 text-gray-400" />
-            <span className="text-gray-400 text-xs truncate">{product.location}</span>
-          </div>
-
           {/* Add to cart */}
           <button
             onClick={handleAddToCart}

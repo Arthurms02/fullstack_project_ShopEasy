@@ -68,6 +68,12 @@ export async function fetchFavorites(): Promise<number[]> {
   return listID;
 }
 
+export async function queryProducts(searchTerm: string): Promise<Product[]> {
+  const { data } = await api.get(BASE, { params: { search: searchTerm } });
+  console.log("Resposta da API de busca:", data);
+  return data.results ?? data; // Suporta tanto resposta paginada quanto não paginada
+}
+
 export async function toggleFavorite(productId: number, isFavorite: boolean): Promise<void> {
   console.log("Toggling favorite for productId:", productId, "isFavorite:", isFavorite);
   if (isFavorite) {

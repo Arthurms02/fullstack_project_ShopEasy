@@ -189,7 +189,6 @@ export default function Cart() {
                                     </div>
 
                                     <div className="flex items-center gap-1.5 mt-1 mb-3">
-                                        <span className="text-xs text-gray-500">{product.category}</span>
                                         <span className="text-gray-300">•</span>
                                         <span className="text-xs text-gray-500">{product.condition}</span>
                                     </div>
@@ -217,12 +216,11 @@ export default function Cart() {
                                             </button>
                                         </div>
                                         <div className="text-right">
-                                            <span className="text-xs text-gray-500">{product.category ?? ""}</span>
                                             <p className="text-orange-600 font-semibold">
                                                 R$ {(product.price * quantity).toLocaleString("pt-BR")}
                                             </p>
                                             {product.price != null && (
-                                                <p className="text-gray-400 text-xs line-through">R$ {(product.price * quantity).toLocaleString("pt-BR")}</p>
+                                                <p className="text-gray-400 text-xs line-through">R$ {Number((product.price * 1.2)).toLocaleString("pt-BR")}</p>
                                             )}
                                         </div>
                                     </div>

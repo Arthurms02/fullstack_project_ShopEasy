@@ -1,7 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
 import {
   Store,
   Search,
@@ -21,6 +18,7 @@ import type { RootState } from "../app/store";
 import { logout } from "../features/auth/authSlice";
 import { logoutRequest } from "../features/auth/authAPI";
 import Logo from "./Logo";
+
 
 
 
@@ -46,7 +44,7 @@ export default function NavBar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-  // const [filtro, setFiltro] = useState("");
+  const [filtro, setFiltro] = useState("");
 
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -58,15 +56,13 @@ export default function NavBar() {
     setMobileMenuOpen(false);
   };
 
-  // const { data: produtosFiltrados } = useQuery({
-  //   queryKey: ["produtos", filtro],
-  //   queryFn: async () => {
-  //     if (!filtro) return [];
-  //     const { data } = await api.get(`/api/v1/products/?search=${encodeURIComponent(filtro)}`);
-  //     return data;
-  //   },
-  //   enabled: !!filtro,
-  // });
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (filtro.trim()) {
+      navigate(`/produtos?q=${encodeURIComponent(filtro)}`);
+      setFiltro(""); // Limpa o input
+    }
+  };
 
   useEffect(() => {
     // fecha menu mobile quando muda rota
@@ -97,7 +93,7 @@ export default function NavBar() {
           <Logo />
           {/* Desktop search */}
           <form
-            // onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSearch}
             className="hidden md:flex flex-1 max-w-xl mx-6"
             role="search"
           >
@@ -105,7 +101,8 @@ export default function NavBar() {
               <input
                 type="text"
                 placeholder="Buscar produtos..."
-                // {...register("query")}
+                value={filtro}
+                onChange={(e) => setFiltro(e.target.value)}
                 className="flex-1 px-4 py-2 outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
               />
               <button
@@ -234,7 +231,9 @@ export default function NavBar() {
               </button>
 
               <button
-                onClick={() => setMobileMenuOpen((s) => !s)}
+                onClick={(e) =>{
+                  e.stopPropagation();
+                  setMobileMenuOpen((s) => !s)}}
                 className="p-2 text-gray-600 hover:text-gray-900"
                 aria-label="Abrir menu"
               >
@@ -247,12 +246,13 @@ export default function NavBar() {
         {/* Mobile search */}
         {mobileSearchOpen && (
           <div className="md:hidden mt-2 mb-2">
-            <form className="px-2">
+            <form onSubmit={handleSearch} className="px-2">
               <div className="flex w-full border border-gray-300 rounded-lg overflow-hidden">
                 <input
                   type="text"
                   placeholder="Buscar produtos..."
-                  // {...register("query")}
+                  value={filtro}
+                  onChange={(e) => setFiltro(e.target.value)}
                   className="flex-1 px-4 py-2 outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
                 />
                 <button type="submit" className="bg-orange-500 hover:bg-orange-600 px-4 py-2 text-white transition-colors">

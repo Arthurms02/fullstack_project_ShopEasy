@@ -71,9 +71,7 @@ export function AppRoutes() {
                 </Route>
                 <Route element={<AppLayout />}>
                     <Route path="/" element={
-                        <PrivateRoute>
-                            <HomePage />
-                        </PrivateRoute>
+                        <HomePage />
                     } />
                     <Route path="/vender" element={
                         <PrivateRoute>
@@ -81,9 +79,7 @@ export function AppRoutes() {
                         </PrivateRoute>
                     } />
                     <Route path="/carrinho" element={
-                        <PrivateRoute>
-                            <CartPage />
-                        </PrivateRoute>
+                        <CartPage />
                     } />
                     <Route path="/produtos" element={
                         <PrivateRoute>

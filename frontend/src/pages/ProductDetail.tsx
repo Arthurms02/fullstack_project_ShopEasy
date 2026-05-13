@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate } from "react-router";
+import { useParams, Link, useNavigate, useSearchParams } from "react-router";
 import {
   ShoppingCart,
   ArrowLeft,
@@ -10,11 +10,13 @@ import {
   Package,
   AlertCircle,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProductCard  from "../components/ProductCard";
 // import { useCart } from "../context/CartContext";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../app/store";
+import { queryProducts } from "../features/product/productAPI";
+import { fetchProductsSuccess } from "../features/product/productSlice";
 
 
 export default function ProductDetail() {
@@ -29,7 +31,24 @@ export default function ProductDetail() {
   const {  isLoading, error } = useSelector((state: RootState) => state.products) ;
   const product = useSelector((state: RootState) => state.products.products.find(p => p.id === Number(id)));
   const { products } = useSelector((state: RootState) => state.products);
-  console.log("Produtos no estado:", products);
+  const dispatch = useDispatch();
+
+  const [searchParams] = useSearchParams();
+
+  const searchQuery = searchParams.get("q") || "";
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (searchQuery.trim()){
+          const result = await queryProducts(searchQuery);
+            dispatch(fetchProductsSuccess(result));
+          }
+        } catch (e) {
+          console.error("Falha ao carregar produtos:", e);
+        }
+      })();
+    }, [searchQuery, dispatch]);
 
   // Produtos relacionados: outros da lista excluindo o atual
   const related = products

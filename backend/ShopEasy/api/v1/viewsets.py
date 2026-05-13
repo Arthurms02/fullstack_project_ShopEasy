@@ -10,6 +10,7 @@ from ShopEasy.api.v1.serializers import (CartItemSerializer, CartSerializer, Cat
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView)
+from rest_framework.filters import SearchFilter
 
 from core import settings
 
@@ -66,11 +67,20 @@ class RegisterViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
             status=status.HTTP_201_CREATED
         )
 
+class CustomSearchFilter(SearchFilter):
+    search_param = 'q'
+
 class ProductViewSet(viewsets.ModelViewSet):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
+
+    filter_backends = [CustomSearchFilter]
+    search_fields = ['name', 'description']
+    ordering_fields = ['id', 'name', 'price', 'created_at']  # Campos que podem ser ordenados
+    ordering = ['-created_at']  # Padrão: mais recentes primeiro
+    
 
     def get_queryset(self):
         queryset = Product.objects.all()
