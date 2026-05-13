@@ -43,7 +43,7 @@ export default function Cart() {
                 console.error("Falha ao carregar carrinho:", e);
             }
         })();
-    }, [dispatch]);
+    }, []);
 
 
     const applyCoupon = () => {

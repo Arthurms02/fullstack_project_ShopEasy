@@ -80,7 +80,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'description']
     ordering_fields = ['id', 'name', 'price', 'created_at']  # Campos que podem ser ordenados
     ordering = ['-created_at']  # Padrão: mais recentes primeiro
-    
+
 
     def get_queryset(self):
         queryset = Product.objects.all()
@@ -276,17 +276,11 @@ class FavoriteViewSet(viewsets.ModelViewSet):
         favorito, created = Favorite.all_objects.get_or_create(user=user, product_id=product_id)
 
         if not created:
-            favorito.delete()
+            favorito.hard_delete()
             return Response({'isFavorite': False}, status=status.HTTP_200_OK)
 
         return Response({'isFavorite': True}, status=status.HTTP_201_CREATED)
 
-    # def destroy(self, request, pk=None):
-    #     favorite = Favorite.all_objects.filter(pk=pk, user=request.user).first()
-    #     if not favorite:
-    #         return Response({"error": "Favorito não encontrado"}, status=status.HTTP_404_NOT_FOUND)
-    #     favorite.hard_delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class OrderItemViewSet(viewsets.ModelViewSet):

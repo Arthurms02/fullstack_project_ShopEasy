@@ -1,23 +1,26 @@
 import { Link } from "react-router";
 import { ShoppingCart, Heart } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { ProductCardProps } from "../features/product/productType";
 import { addToCart } from "../features/cart/cartSlice";
 import { addToCartApi } from "../features/cart/cartAPI";
 import { toggleFavorite } from "../features/product/productAPI";
+import { setFavorites, removeFavorite } from "../features/product/favoriteSlice";
 import type { RootState } from "../app/store";
-
 
 
 
 export default function ProductCard({ product }: ProductCardProps) {
 
   const dispatch = useDispatch();
-  const isfavoriteInStore = useSelector((state: RootState) => state.favorites.items?.includes(product.id));
   const [added, setAdded] = useState(false);
-  const [favorite, setFavorite] = useState(isfavoriteInStore);
+  const favorite = useSelector((state: RootState) => state.favorites.items.includes(product.id));
 
+  // useEffect(() => {
+  //   // Sincroniza o estado local com o estado global de favoritos
+  //   // Isso é útil caso o usuário tenha favoritado/desfavoritado o produto em outra parte do app
+  // }, [favorite]);
 
   const generateRandomDiscount = (productId: number): number => {
   // Usa o ID como seed para gerar sempre o mesmo desconto
@@ -46,16 +49,16 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const previousFavorite = favorite;
-    setFavorite(!previousFavorite); // Atualiza o estado local imediatamente para feedback visual
-
     try {
-      console.log("Toggling favorite para productId:", product.id, "isFavorite:", !previousFavorite);
-      await toggleFavorite(product.id!, !previousFavorite);
-      // dispatch(getProductFavoriteToggle({ productId: product.id!, isFavorite: !previousFavorite }));
-    } catch (error) {
-      console.error("Erro ao atualizar lista de favoritos:", error);
-      setFavorite(previousFavorite); // Reverte o estado local em caso de erro
+      if (favorite) {
+        dispatch(removeFavorite(product));
+      } else {
+        dispatch(setFavorites(product));
+      }
+      await toggleFavorite(product.id!);
+    } catch (error)
+     {
+      console.error("Erro ao atualizar favoritos:", error);
     }
   };
 
@@ -95,7 +98,6 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Content */}
         <div className="p-3">
-          <p className="text-gray-500 text-xs mb-1">{product.category}</p>
           <h3 className="text-gray-900 text-sm font-medium line-clamp-2 mb-2 group-hover:text-orange-600 transition-colors">
             {product.name}
           </h3>

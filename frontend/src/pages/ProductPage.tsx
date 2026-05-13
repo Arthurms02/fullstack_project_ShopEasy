@@ -35,6 +35,7 @@ export default function Products() {
   // ── React Query ────────────────────────────────────────────────────────────
   const { products , isLoading, error } = useSelector((state: RootState) => state.products);
 
+
   const filteredProducts = products
     .filter((p) => {
       if (query) {

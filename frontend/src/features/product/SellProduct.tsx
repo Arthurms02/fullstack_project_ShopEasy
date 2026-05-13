@@ -14,7 +14,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { createProduct } from "./productAPI";
 
-// POST /products → { name, description, price, stock, image_url }
+
 const schema = yup.object({
   name: yup
     .string()

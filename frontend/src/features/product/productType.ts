@@ -20,7 +20,8 @@ export type ProductState = {
 export type ListParams = {
   search?: string;
   showDeleted?: boolean;
-  [k: string]: any };
+  [k: string]: any
+};
 
 export type ProductCardProps = {
   product: Product;
@@ -29,4 +30,9 @@ export type ProductCardProps = {
 export type ProductFavorite = {
   user: User;
   product: Product;
+}
+
+export type FavoritesState = {
+  items: number[];
+  loading: boolean;
 }

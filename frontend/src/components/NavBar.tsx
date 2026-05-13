@@ -21,7 +21,6 @@ import Logo from "./Logo";
 
 
 
-
 export default function NavBar() {
   const navigate = useNavigate();
   const location = useLocation();

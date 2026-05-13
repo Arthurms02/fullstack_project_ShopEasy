@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { store } from './store';
+import { store } from '../app/store';
 import { logout } from '../features/auth/authSlice';
 
 const api = axios.create({
@@ -27,7 +27,10 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         // refresh falhou => token expirou definitivamente
-        try { store.dispatch(logout()); } catch (_) { /* ignore */ }
+        try {
+          store.dispatch(logout());
+        } catch (error)
+        { console.error("Erro ao despachar logout:", error); }
 
         if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
           // força reload para /login (reset do estado)

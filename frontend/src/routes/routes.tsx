@@ -21,7 +21,7 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
 
 
     if (isLoading) {
-        return <Loading />;
+        return <Loading text="Carregando..." />;
     }
 
     if (!isAuthenticated) {
@@ -46,24 +46,24 @@ function AppLayout() {
 }
 
 function NotFound() {
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <p className="text-8xl mb-4 font-bold text-gray-200">404</p>
-        <h2 className="text-gray-700 mb-2">Página não encontrada</h2>
-        <a href="/" className="text-orange-500 hover:underline text-sm">
-          Voltar ao início
-        </a>
-      </div>
-    </div>
-  );
+    return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="text-center">
+                <p className="text-8xl mb-4 font-bold text-gray-200">404</p>
+                <h2 className="text-gray-700 mb-2">Página não encontrada</h2>
+                <a href="/" className="text-orange-500 hover:underline text-sm">
+                    Voltar ao início
+                </a>
+            </div>
+        </div>
+    );
 }
 
 
 
 export function AppRoutes() {
     return (
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<Loading text="Carregando..." />}>
             <Routes>
                 <Route element={<AuthLayout />}>
                     <Route path="/login" element={<LoginPage />} />

@@ -5,11 +5,8 @@ import ProductCard from "../components/ProductCard";
 import { useDispatch, useSelector } from "react-redux";
 import { type RootState } from "../app/store";
 import { useEffect } from "react";
-import { listAllProducts, fetchFavorites } from "../features/product/productAPI";
+import { listAllProducts } from "../features/product/productAPI";
 import { fetchProductsSuccess } from "../features/product/productSlice";
-import { toggleFavoriteInStore } from "../features/product/favoriteSlice";
-
-
 
 
 const heroImage =
@@ -21,6 +18,7 @@ export default function Home() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+
   // Selecionando apenas o necessário do estado
   const { products, isLoading } = useSelector((state: RootState) => state.products);
 
@@ -28,20 +26,17 @@ export default function Home() {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        // Carrega produtos iniciais 
+        // Carrega produtos iniciais
         const data = await listAllProducts();
         dispatch(fetchProductsSuccess(data));
-        
-        // Carrega favoritos do usuário
-        const favoriteIds = await fetchFavorites();
-        dispatch(toggleFavoriteInStore(favoriteIds));
+
       } catch (e) {
         console.error("Erro ao carregar dados iniciais:", e);
       }
     };
 
     loadInitialData();
-  }, [dispatch]); // Dependência limpa
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +88,7 @@ export default function Home() {
                 <span className="hidden sm:inline">Buscar</span>
               </button>
             </form>
-            
+
             {/* Tags sugeridas */}
             <div className="flex flex-wrap justify-center gap-2 mt-8">
               {["iPhone", "MacBook", "RTX 4070", "Monitor"].map((tag) => (

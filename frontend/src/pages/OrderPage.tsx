@@ -1,4 +1,4 @@
-import { useNavigate, Navigate } from "react-router";
+import { useNavigate } from "react-router";
 import {
   ArrowLeft,
   MapPin,

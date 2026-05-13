@@ -1,5 +1,5 @@
 import type { Product } from '../product/productType';
-import api from '../../app/api';
+import api from '../../services/api';
 
 export async function fetchCart() {
   const res = await api.get('/api/v1/cart/');

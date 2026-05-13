@@ -12,22 +12,21 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import ProductCard  from "../components/ProductCard";
-// import { useCart } from "../context/CartContext";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../app/store";
 import { queryProducts } from "../features/product/productAPI";
 import { fetchProductsSuccess } from "../features/product/productSlice";
+import { addToCart } from "../features/cart/cartSlice";
 
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  // const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [wishlist, setWishlist] = useState(false);
   const [added, setAdded] = useState(false);
 
-  // ── React Query ────────────────────────────────────────────────────────────
+
   const {  isLoading, error } = useSelector((state: RootState) => state.products) ;
   const product = useSelector((state: RootState) => state.products.products.find(p => p.id === Number(id)));
   const { products } = useSelector((state: RootState) => state.products);
@@ -48,14 +47,14 @@ export default function ProductDetail() {
           console.error("Falha ao carregar produtos:", e);
         }
       })();
-    }, [searchQuery, dispatch]);
+    }, [searchQuery]);
 
   // Produtos relacionados: outros da lista excluindo o atual
   const related = products
     ? products.filter((p) => p.id !== product?.id).slice(0, 4)
     : [];
 
-  // ── States ─────────────────────────────────────────────────────────────────
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -84,14 +83,14 @@ export default function ProductDetail() {
 
   const handleAddToCart = () => {
     if (!inStock) return;
-    for (let i = 0; i < quantity; i++) //addToCart(products);
+    for (let i = 0; i < quantity; i++) addToCart(product);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
 
   const handleBuyNow = () => {
     if (!inStock) return;
-    for (let i = 0; i < quantity; i++) //addToCart(products);
+    for (let i = 0; i < quantity; i++)
     navigate("/carrinho");
   };
 
