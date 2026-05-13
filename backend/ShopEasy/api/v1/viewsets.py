@@ -10,6 +10,7 @@ from ShopEasy.api.v1.serializers import (CartItemSerializer, CartSerializer, Cat
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView)
+from rest_framework.filters import SearchFilter
 
 from core import settings
 
@@ -66,12 +67,21 @@ class RegisterViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
             status=status.HTTP_201_CREATED
         )
 
+class CustomSearchFilter(SearchFilter):
+    search_param = 'q'
+
 class ProductViewSet(viewsets.ModelViewSet):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
     search_fields = ['name', 'description']
+
+    filter_backends = [CustomSearchFilter]
+    search_fields = ['name', 'description']
+    ordering_fields = ['id', 'name', 'price', 'created_at']  # Campos que podem ser ordenados
+    ordering = ['-created_at']  # Padrão: mais recentes primeiro
+
 
     def get_queryset(self):
         queryset = Product.objects.all()
@@ -267,7 +277,7 @@ class FavoriteViewSet(viewsets.ModelViewSet):
         favorito, created = Favorite.all_objects.get_or_create(user=user, product_id=product_id)
 
         if not created:
-            favorito.delete()
+            favorito.hard_delete()
             return Response({'isFavorite': False}, status=status.HTTP_200_OK)
 
         return Response({'isFavorite': True}, status=status.HTTP_201_CREATED)
@@ -405,7 +415,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 httponly=True,
                 secure=settings.SECURE_COOKIE,
                 samesite="Lax",  # ou 'Strict' conforme necessidade
-                max_age=3600,
+                max_age=86400,  # 1 dia
                 path="/"
             )
 

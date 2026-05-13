@@ -25,7 +25,11 @@ const productSlice = createSlice({
       state.error = action.payload;
       state.isLoading = false;
     },
-    fetchProductByIdStart(state) {
+    fetchProductByIdStart(state, action: PayloadAction<number>) {
+      const product = state.products.find(p => p.id === action.payload);
+      if (product) {
+        state.isLoading = true;
+      }
       state.isLoading = true;
       state.error = null;
     },
@@ -43,19 +47,6 @@ const productSlice = createSlice({
       }
       state.isLoading = false;
     },
-    getProductFavoriteToggle(state, action: PayloadAction<{ productId: number; isFavorite: boolean }>) {
-      const { productId, isFavorite } = action.payload;
-      const product = state.products.find(p => p.id === productId);
-      if (product) {
-        product.isFavorite = isFavorite;
-      }
-    },
-    setFavoritesFromList(state, action: PayloadAction<{ productId: number }[]>) {
-      const favoriteIds = new Set(action.payload.map(fav => fav.productId));
-      state.products.forEach(product => {
-        product.isFavorite = favoriteIds.has(product.id!);
-      });
-    },
   },
 });
 
@@ -64,7 +55,6 @@ export const { fetchProductsStart,
   fetchProductsFailure,
   fetchProductByIdStart,
   fetchProductByIdSuccess,
-  getProductFavoriteToggle,
-  setFavoritesFromList } = productSlice.actions;
+} = productSlice.actions;
 
 export default productSlice.reducer;

@@ -15,7 +15,7 @@ export function useProducts() {
   return useQuery({
     queryKey: QUERY_KEYS.products,
     queryFn: listAllProducts,
-    staleTime: 1000 * 60 * 5, // 5 min
+    staleTime: 1000 * 60 * 5, 
   });
 }/** Retorna um produto pelo id */
 export function useProduct(id: number) {

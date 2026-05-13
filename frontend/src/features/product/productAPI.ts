@@ -1,4 +1,4 @@
-import api from '../../app/api';
+import api from '../../services/api';
 import type { Product } from './productType';
 import type { ListParams }  from './productType';
 
@@ -26,7 +26,6 @@ export async function listAllProducts(params?: ListParams): Promise<Product[]> {
       continue;
     }
 
-    // fallback: se formato inesperado, tenta devolver como array
     return (data as Product[]) ?? [];
   }
 
@@ -59,21 +58,21 @@ export async function restoreProduct(id: number): Promise<Product> {
 
 export async function fetchFavorites(): Promise<number[]> {
   const res = await api.get('/api/v1/favorites/');
-  const listID: number[] = [];
-  console.log("Resposta da API de favoritos:", res.data.results);
+  const listObjects = res.data.results ?? res.data;
+  const listID: number[] = listObjects.map((item: any) => item.product);
 
-  for (const item of res.data.results) {
-    listID.push(item.id );
-  }
   return listID;
 }
 
-export async function toggleFavorite(productId: number, isFavorite: boolean): Promise<void> {
-  console.log("Toggling favorite for productId:", productId, "isFavorite:", isFavorite);
-  if (isFavorite) {
-    console.log("Adicionando aos favoritos:", productId);
-    await api.post('/api/v1/favorites/', { product: productId });
-  }
+export async function queryProducts(searchTerm: string): Promise<Product[]> {
+  const { data } = await api.get(BASE, { params: { search: searchTerm } });
+  console.log("Resposta da API de busca:", data);
+  return data.results ?? data; // Suporta tanto resposta paginada quanto não paginada
+}
+
+export async function toggleFavorite(productId: number): Promise<boolean> {
+  const res = await api.post('/api/v1/favorites/', { product: productId });
+  return res.data.isFavorite;
 }
 
 export default {

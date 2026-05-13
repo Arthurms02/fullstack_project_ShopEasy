@@ -1,53 +1,105 @@
-# fullstack_project_ShopEasy
+# 🛒 ShopEasy - E-commerce Full Stack
 
-🛒 LivreMercado - E-commerce Full Stack
+O **ShopEasy** é uma plataforma completa de compra e venda online, desenvolvida para oferecer uma experiência moderna, intuitiva e eficiente tanto para vendedores quanto para clientes.
 
-O LivreMercado é uma plataforma completa de compra e venda online, desenvolvida para oferecer uma experiência fluida tanto para vendedores quanto para clientes.
+O projeto integra um **front-end moderno em React + TypeScript** com um **back-end robusto em Django REST Framework**, formando um ecossistema full stack escalável e responsivo.
 
-O projeto integra um front-end moderno em React com um back-end robusto em Django, formando um ecossistema escalável e eficiente.
+---
 
-🚀 Funcionalidades:
-🔐 Autenticação
-Login e registro de usuários
-Validação de dados
-🛍️ Perfil de Vendedor
-Cadastro de produtos
-Gerenciamento de vendas
-👤 Experiência do Cliente
-Busca de produtos
-Navegação por categorias
-Carrinho de compras
-📈 Marketplace Dinâmico
-Produtos em destaque
-Sistema de avaliações
-Filtros de busca rápida
-📱 Interface Responsiva
-Design moderno e intuitivo (UI/UX)
-Compatível com diferentes dispositivos
+## 🚀 Funcionalidades
 
-🧰 Tecnologias Utilizadas:
-🎨 Front-end
-React (com TypeScript)
-Tailwind CSS
-Lucide React
-⚙️ Back-end
-Python
-Django
-Django REST Framework
-🔧 Ferramentas
-Venv (ambiente virtual)
+### 🔐 Autenticação
+- Login de usuários
+- Registro de contas
+- Validação de dados
+- Sistema de autenticação JWT
 
-⚙️ Como Rodar o Projeto
-1️⃣ Clonar o repositório
-git clone https://github.com/seu-usuario/livre-mercado.git
-cd livre-mercado
-2️⃣ Configurar o Back-end (Django)
+### 🛍️ Perfil de Vendedor
+- Cadastro de produtos
+- Gerenciamento de vendas
+- Controle de estoque
+
+### 👤 Experiência do Cliente
+- Busca de produtos
+- Navegação por categorias
+- Carrinho de compras
+- Visualização de detalhes do produto
+
+### 📈 Marketplace Dinâmico
+- Produtos em destaque
+- Sistema de avaliações
+- Filtros de busca rápida
+
+### 📱 Interface Responsiva
+- Design moderno e intuitivo (UI/UX)
+- Compatível com desktop e dispositivos móveis
+
+---
+
+## 🧰 Tecnologias Utilizadas
+
+### 🎨 Front-end
+- React
+- TypeScript
+- Tailwind CSS
+- Lucide React
+- Vite
+
+### ⚙️ Back-end
+- Python
+- Django
+- Django REST Framework
+
+### 🗄️ Banco de Dados
+- PostgreSQL
+
+### 🔧 Ferramentas
+- Venv
+- Git & GitHub
+
+---
+
+## 📁 Estrutura do Projeto
+
+```bash
+fullstack_project_ShopEasy/
+│
+├── backend/      # API Django REST
+├── frontend/     # Interface React
+└── README.md
+
+
+### ⚙️ Como Rodar o Projeto
+
+### 1️⃣ Clonar o repositório
+
+```bash
+git clone https://github.com/Arthurms02/fullstack_project_ShopEasy.git
+cd fullstack_project_ShopEasy
+```
+
+---
+
+### 2️⃣ Configurar o Banco de Dados (PostgreSQL)
+
+Crie um banco chamado:
+
+```sql
+CREATE DATABASE shopeasy;
+```
+
+---
+
+### 3️⃣ Configurar o Back-end (Django)
+
+```bash
 cd backend
 
 # Criar ambiente virtual
 python -m venv venv
 
 # Ativar ambiente virtual
+
 # Windows:
 venv\Scripts\activate
 
@@ -56,13 +108,60 @@ source venv/bin/activate
 
 # Instalar dependências
 pip install -r requirements.txt
+```
 
-# Rodar migrações
+---
+
+### Configurar variáveis de ambiente
+
+Crie um arquivo `.env` dentro da pasta `backend`:
+
+```env
+SECRET_KEY=sua_chave_super_secreta
+
+DATABASE_NAME=shopeasy
+DATABASE_USER=postgres
+DATABASE_PASSWORD=sua_senha
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+```
+
+---
+
+### Rodar migrações
+
+```bash
 python manage.py migrate
+```
 
-# Iniciar servidor
+---
+
+### Criar superusuário
+
+```bash
+python manage.py createsuperuser
+```
+
+---
+
+### Iniciar servidor Django
+
+```bash
 python manage.py runserver
-3️⃣ Configurar o Front-end (React + TS)
+```
+
+Backend disponível em:
+
+```bash
+http://127.0.0.1:8000/
+```
+---
+
+### 4️⃣ Configurar o Front-end (React + TS)
+
+Abra outro terminal:
+
+```bash
 cd frontend
 
 # Instalar dependências
@@ -70,23 +169,45 @@ npm install
 
 # Rodar aplicação
 npm run dev
+```
 
-🖥️ Demonstração da Interface
-🏠 Home Page
-Banner de busca centralizado
-Acesso rápido às categorias:
-Celulares
-Notebooks
-Monitores
+Frontend disponível em:
 
-📦 Listagem de Produtos
-Grid de produtos com:
+```bash
+http://localhost:5173/
+```
+### Configurar variáveis de ambiente do Front-end
+
+Crie um arquivo `.env.local` dentro da pasta `frontend`:
+
+```env
+VITE_API_BASE_URL = sua api Backend
+```
+---
+
+### 🖥️ Demonstração da Interface
+
+## 🏠 Home Page
+Banner principal
+Produtos em destaque
+Busca rápida
+
+## 📦 Produtos
 Imagens
-Preços
 Avaliações
-Botão de adicionar ao carrinho
+Preços
+Carrinho
 
-👨💻 Autores
+## 👤 Área do Usuário
+Login
+Registro
+Perfil
+Home
+
+## 👨‍💻 Autores
 Arthur
 Arnaldo
 Guilherme
+
+## 📄 Licença
+Este projeto foi desenvolvido para fins acadêmicos e de aprendizado.

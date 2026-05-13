@@ -8,12 +8,12 @@ export type CartItem = {
 
 export type Cart = {
   items: CartItem[];
-  total_items: number;
-  total_price: number;
+  totalItems: number;
+  totalPrice: number;
 }
 
 export type CartState = {
   items: CartItem[];
-  total_items?: number;
-  total_price?: number;
+  totalItems: number;
+  totalPrice: number;
 }

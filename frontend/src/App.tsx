@@ -5,7 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { type RootState } from "./app/store";
 import { loginFailure, loginSuccess } from "./features/auth/authSlice";
 import { useEffect } from "react";
-import api from "./app/api";
+import api from "./services/api";
+import Loading  from "./components/Loading";
+import { fetchFavorites } from "./features/product/productAPI";
+import { setFavoritesList } from "./features/product/favoriteSlice";
 
 
 const queryClient = new QueryClient();
@@ -14,9 +17,8 @@ function AppContent() {
     const { isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
 
     if (isAuthenticated === null || isLoading) {
-    return <div>Carregando sessão...</div>;
+    return <Loading text="Carregando sessão..." />;
   }
-
 
     return (
         <BrowserRouter>
@@ -33,15 +35,18 @@ function App() {
     useEffect(() => {
         const checkSession = async () => {
             try {
-                // Tente acessar QUALQUER rota sua que precise de token
+                // Tente acessar uma rota protegida
                 const res = await api.get('/api/v1/users/me/'); // Exemplo de rota protegida
                 dispatch(loginSuccess(res.data));
+
+                // Se autenticado, carregue os favoritos
+                const favoriteIds = await fetchFavorites();
+                dispatch(setFavoritesList(favoriteIds));
             } catch (err) {
                 // O interceptor já vai tentar o refresh antes de chegar aqui
                 dispatch(loginFailure("Usuário não autenticado"));
             }
         };
-
         checkSession();
     }, [dispatch]);
 

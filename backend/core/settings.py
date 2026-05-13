@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 import environ
 
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'drf_spectacular_sidecar',
     'corsheaders',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -124,6 +126,11 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'API for ShopEasy E-commerce Plataform',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA':False,
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),  # ← Aumentar aqui
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 }
 
 AUTH_USER_MODEL = 'ShopEasy.User'

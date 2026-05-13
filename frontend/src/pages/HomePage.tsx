@@ -5,13 +5,13 @@ import ProductCard from "../components/ProductCard";
 import { useDispatch, useSelector } from "react-redux";
 import { type RootState } from "../app/store";
 import { useEffect } from "react";
-import { listAllProducts, fetchFavorites } from "../features/product/productAPI";
+import { listAllProducts } from "../features/product/productAPI";
 import { fetchProductsSuccess } from "../features/product/productSlice";
-import { toggleFavoriteInStore } from "../features/product/favoriteSlice";
 
 
 const heroImage =
-  "https://images.unsplash.com/photo-1758874573757-bbf1ef6d1bc5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYXJrZXRwbGFjZSUyMHNob3BwaW5nJTIwb25saW5lJTIwaGVyb3xlbnwxfHx8fDE3NzcwNzU2ODh8MA&ixlib=rb-4.1.0&q=80&w=1080";
+  "https://fastly.picsum.photos/id/348/3872/2592.jpg?hmac=I51bqSjuTk6zKHgtJDpMLY3kSSfAXdB8AHGmWf-Eq1Q";
+
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -19,79 +19,83 @@ export default function Home() {
   const dispatch = useDispatch();
 
 
-  const { isLoading } = useSelector((state: RootState) => state.products);
+  // Selecionando apenas o necessário do estado
+  const { products, isLoading } = useSelector((state: RootState) => state.products);
+
 
   useEffect(() => {
-    (async () => {
+    const loadInitialData = async () => {
       try {
-        const products = await listAllProducts();
-        dispatch(fetchProductsSuccess(products));
-        const favoriteIds = await fetchFavorites();
-        dispatch(toggleFavoriteInStore(favoriteIds));
+        // Carrega produtos iniciais
+        const data = await listAllProducts();
+        dispatch(fetchProductsSuccess(data));
 
       } catch (e) {
-        console.error("Falha ao carregar produtos:", e);
+        console.error("Erro ao carregar dados iniciais:", e);
       }
-    })();
-  }, [dispatch]);
+    };
 
-  const allProducts = useSelector((state: RootState) => state.products.products);
+    loadInitialData();
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/produtos?q=${encodeURIComponent(searchQuery.trim())}`);
+    const query = searchQuery.trim();
+    if (query) {
+      // A Home apenas envia o usuário para a listagem com o parâmetro na URL
+      navigate(`/produtos?q=${encodeURIComponent(query)}`);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
+      {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-orange-500 to-orange-600 overflow-hidden">
         <div
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 opacity-20 transition-opacity duration-500 hover:opacity-30"
           style={{
             backgroundImage: `url(${heroImage})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center text-white">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl mb-4 drop-shadow">
-              Compre e Venda com{" "}
-              <span className="text-yellow-300">Facilidade</span>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
+              Compre e Venda com <span className="text-yellow-300">Facilidade</span>
             </h1>
-            <p className="text-orange-100 text-base sm:text-lg mb-8 max-w-xl mx-auto">
+            <p className="text-orange-100 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
               Milhares de produtos à sua disposição. Encontre as melhores ofertas
               ou anuncie o que você não usa mais.
             </p>
 
             <form
               onSubmit={handleSearch}
-              className="flex max-w-lg mx-auto bg-white rounded-xl overflow-hidden shadow-lg"
+              className="flex max-w-2xl mx-auto bg-white rounded-2xl overflow-hidden shadow-2xl focus-within:ring-4 focus-within:ring-orange-300 transition-all"
             >
               <input
                 type="text"
-                placeholder="O que você está procurando?"
+                placeholder="O que você está procurando hoje?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 px-5 py-3.5 outline-none text-gray-800 text-sm placeholder-gray-400"
+                className="flex-1 px-6 py-4 outline-none text-gray-800 text-lg"
               />
               <button
                 type="submit"
-                className="bg-orange-500 hover:bg-orange-600 px-5 py-3.5 text-white transition-colors"
+                className="bg-orange-500 hover:bg-orange-600 px-8 py-4 text-white font-bold transition-colors flex items-center gap-2"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-6 h-6" />
+                <span className="hidden sm:inline">Buscar</span>
               </button>
             </form>
 
-            <div className="flex flex-wrap justify-center gap-2 mt-6">
-              {["iPhone", "Samsung", "MacBook", "RTX 4070", "Logitech", "Monitor"].map((tag) => (
+            {/* Tags sugeridas */}
+            <div className="flex flex-wrap justify-center gap-2 mt-8">
+              {["iPhone", "MacBook", "RTX 4070", "Monitor"].map((tag) => (
                 <button
                   key={tag}
                   onClick={() => navigate(`/produtos?q=${tag}`)}
-                  className="bg-white/20 hover:bg-white/30 text-white text-sm px-3 py-1 rounded-full transition-colors backdrop-blur-sm"
+                  className="bg-white/10 hover:bg-white/25 border border-white/20 text-white text-sm px-4 py-1.5 rounded-full transition-all backdrop-blur-md"
                 >
                   {tag}
                 </button>
@@ -101,22 +105,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Benefits */}
-      <section className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Benefits Section - Adicionado Hover Effects */}
+      <section className="bg-white border-b border-gray-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { icon: Shield, label: "Compra Segura", desc: "Pagamento protegido" },
-              { icon: Truck, label: "Entrega Rápida", desc: "Frete para todo Brasil" },
-              { icon: Star, label: "Avaliações Reais", desc: "Vendedores verificados" },
-              { icon: Zap, label: "Ofertas Diárias", desc: "Descontos exclusivos" },
+              { icon: Shield, label: "Compra Segura", desc: "100% Protegido" },
+              { icon: Truck, label: "Entrega Rápida", desc: "Todo o Brasil" },
+              { icon: Star, label: "Vendedores Pro", desc: "Verificados" },
+              { icon: Zap, label: "Ofertas Flash", desc: "Novidades diárias" },
             ].map(({ icon: Icon, label, desc }) => (
-              <div key={label} className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-5 h-5 text-orange-500" />
+              <div key={label} className="flex items-center gap-4 group">
+                <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center transition-colors group-hover:bg-orange-500">
+                  <Icon className="w-6 h-6 text-orange-500 group-hover:text-white transition-colors" />
                 </div>
                 <div>
-                  <p className="text-gray-900 text-sm font-medium">{label}</p>
+                  <p className="text-gray-900 font-bold text-sm">{label}</p>
                   <p className="text-gray-500 text-xs">{desc}</p>
                 </div>
               </div>
@@ -125,78 +129,56 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Categories — links de busca por nome sem depender de campo category na API */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-gray-900">Categorias</h2>
+      {/* Seção de Produtos com Verificação de Vazio */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="flex items-end justify-between mb-10">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">Destaques da Semana</h2>
+            <p className="text-gray-500 mt-2">Os produtos mais desejados do momento</p>
+          </div>
           <Link
             to="/produtos"
-            className="text-orange-500 hover:text-orange-600 text-sm flex items-center gap-1"
+            className="group text-orange-500 font-semibold flex items-center gap-2 hover:underline"
           >
-            Ver todas <ArrowRight className="w-4 h-4" />
+            Ver catálogo completo <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-          {[
-            { label: "Celulares", icon: "📱", q: "celular" },
-            { label: "Notebooks", icon: "💻", q: "notebook" },
-            { label: "Computadores", icon: "🖥️", q: "pc" },
-            { label: "Teclados", icon: "⌨️", q: "teclado" },
-            { label: "Mouses", icon: "🖱️", q: "mouse" },
-            { label: "Monitores", icon: "🖥️", q: "monitor" },
-          ].map(({ label, icon, q }) => (
-            <Link
-              key={label}
-              to={`/produtos?q=${encodeURIComponent(q)}`}
-              className="flex flex-col items-center gap-2 p-4 bg-white rounded-xl border border-gray-200 hover:border-orange-300 hover:shadow-sm transition-all group"
-            >
-              <span className="text-2xl">{icon}</span>
-              <span className="text-gray-700 text-xs text-center group-hover:text-orange-500 transition-colors">
-                {label}
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
 
-      {/* Featured products */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-gray-900">Destaques</h2>
-          <Link
-            to="/produtos"
-            className="text-orange-500 hover:text-orange-600 text-sm flex items-center gap-1"
-          >
-            Ver todos <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {isLoading ? (
-            <div className="col-span-full flex justify-center py-12">
-              <Loader2 className="w-8 h-8 text-orange-400 animate-spin" />
-            </div>
-          ) : (
-            allProducts.map((product) => (
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="w-12 h-12 text-orange-500 animate-spin mb-4" />
+            <p className="text-gray-500 animate-pulse">Buscando as melhores ofertas...</p>
+          </div>
+        ) : products.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {products.slice(0, 8).map((product) => (
               <ProductCard key={product.id} product={product} />
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20 bg-gray-100 rounded-3xl">
+            <p className="text-gray-500">Nenhum produto em destaque no momento.</p>
+          </div>
+        )}
       </section>
 
-      {/* CTA Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 sm:p-12 text-center">
-          <h2 className="text-white mb-3">Tem algo para vender?</h2>
-          <p className="text-gray-400 mb-6 max-w-md mx-auto text-sm">
-            Anuncie seus produtos gratuitamente e alcance milhares de compradores em todo o Brasil.
-          </p>
-          <Link
-            to="/vender"
-            className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl transition-colors font-medium"
-          >
-            Anunciar Agora
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+      {/* Banner de Venda - Melhorado visualmente */}
+      <section className="max-w-7xl mx-auto px-4 pb-20">
+        <div className="bg-gray-900 rounded-[2rem] p-10 md:p-20 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+            <div className="relative z-10 text-center max-w-2xl mx-auto">
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ganhe dinheiro desapegando!</h2>
+                <p className="text-gray-400 text-lg mb-10">
+                    Anuncie em menos de 2 minutos e alcance compradores em todo o país. É grátis e seguro.
+                </p>
+                <Link
+                    to="/vender"
+                    className="inline-flex items-center gap-3 bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-2xl transition-all font-bold text-lg hover:scale-105 shadow-xl shadow-orange-500/20"
+                >
+                    Começar a Vender
+                    <ArrowRight className="w-5 h-5" />
+                </Link>
+            </div>
         </div>
       </section>
     </div>

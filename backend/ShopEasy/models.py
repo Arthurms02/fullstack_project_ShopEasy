@@ -69,11 +69,21 @@ class User(AbstractBaseUser, PermissionsMixin , BaseModel):
 
 
 class Product(BaseModel):
+
+    CHOICES = [
+        ('Novo', 'novo'),
+        ('Seminovo', 'seminovo'),
+        ('Usado', 'usado'),
+    ]
+
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField()
     image_url = models.URLField(max_length=500, blank=True, null=True)
+    condition = models.CharField(max_length=50, choices=CHOICES, default='Novo')
+
+
 
     def __str__(self):
         return self.name
@@ -126,11 +136,18 @@ class Cart(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
 
+    def __str__(self):
+        return f"Cart of {self.user.nome_completo}"
+
+
 
 class CartItem(BaseModel):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"CartItem {self.id} - {self.product.name} (Cart of {self.cart.user.nome_completo})"
 
 
 
