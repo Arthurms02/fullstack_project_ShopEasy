@@ -65,7 +65,7 @@ export async function fetchFavorites(): Promise<number[]> {
   const data = res.data.results || res.data;
 
   for (const item of data) {
-    // Pega o ID do produto (algumas APIs enviam como item.product, outras como item.id)
+    // Pega o ID do produto favoritado, seja ele diretamente no item ou dentro de item.product
     listID.push(item.product || item.id); 
   }
   return listID;

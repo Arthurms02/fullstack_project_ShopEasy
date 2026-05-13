@@ -51,7 +51,10 @@ export default function NavBar() {
 
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
-  const handleSearch = (e: React.FormEvent) => {
+  //Arnaldo Amaro - Lógica de busca: ao submeter, 
+  // navega para a página de produtos com o query como parâmetro. 
+  // Se já estiver lá, apenas atualiza o parâmetro de busca, o que deve disparar a atualização da lista de produtos
+  const eventoDeBusca = (e: React.FormEvent) => {
     e.preventDefault(); 
     if (searchQuery.trim()) {
       navigate(`/produtos?q=${encodeURIComponent(searchQuery.trim())}`);
@@ -76,11 +79,11 @@ export default function NavBar() {
   }, [location.pathname]);
 
 
-  // fecha mobile menu ao clicar fora
+  // Arnaldo Amaro, mobile menu 
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
+    function eventClicandoFora(e: MouseEvent) {
       const target = e.target as Element;
-      // Se o menu existe, o clique não foi dentro dele, E não foi no botão de abrir
+     
       if (
         mobileMenuRef.current && 
         !mobileMenuRef.current.contains(target) &&
@@ -89,8 +92,9 @@ export default function NavBar() {
         setMobileMenuOpen(false);
       }
     }
-    if (mobileMenuOpen) document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
+
+    if (mobileMenuOpen) document.addEventListener("click", eventClicandoFora);
+    return () => document.removeEventListener("click", eventClicandoFora);
   }, [mobileMenuOpen]);
 
 
@@ -103,9 +107,8 @@ export default function NavBar() {
           {/* Logo */}
           <Logo />
           {/* Desktop search */}
-          {/* Desktop search */}
           <form
-            onSubmit={handleSearch}
+            onSubmit={eventoDeBusca}
             className="hidden md:flex flex-1 max-w-xl mx-6"
             role="search"
           >
@@ -222,8 +225,6 @@ export default function NavBar() {
                 </Link>
               )}
             </div>
-
-            {/* Mobile controls */}
             {/* Mobile controls */}
             <div className="flex md:hidden items-center gap-2">
               <Link to="/carrinho" className="relative p-2 text-gray-600 hover:text-gray-900">
@@ -258,7 +259,7 @@ export default function NavBar() {
         {/* Mobile search */}
         {mobileSearchOpen && (
           <div className="md:hidden mt-2 mb-2 px-2">
-            <form onSubmit={handleSearch}>
+            <form onSubmit={eventoDeBusca}>
               <div className="flex w-full border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-orange-400">
                 <input
                   type="text"

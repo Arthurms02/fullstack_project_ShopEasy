@@ -61,6 +61,7 @@ export default function Products() {
 
   const dispatch = useDispatch();
 
+//Arnaldo Amaro, materializa a lista de produtos: se ainda não tiver produtos, busca da API e salva no Redux.
 useEffect(() => {
   if (allProducts.length === 0) {
     listAllProducts()
@@ -68,7 +69,7 @@ useEffect(() => {
       .catch(console.error);
   }
 }, [dispatch, allProducts.length]);
-  
+
 
   const hasFilters =
     priceRange.min || priceRange.max || onlyInStock || query;

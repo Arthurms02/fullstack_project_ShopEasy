@@ -56,6 +56,8 @@ class RegisterViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
 
+    authentication_classes = []
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -271,12 +273,12 @@ class FavoriteViewSet(viewsets.ModelViewSet):
 
         return Response({'isFavorite': True}, status=status.HTTP_201_CREATED)
 
-    # def destroy(self, request, pk=None):
-    #     favorite = Favorite.all_objects.filter(pk=pk, user=request.user).first()
-    #     if not favorite:
-    #         return Response({"error": "Favorito não encontrado"}, status=status.HTTP_404_NOT_FOUND)
-    #     favorite.hard_delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
+    def destroy(self, request, pk=None):
+        favorite = Favorite.all_objects.filter(pk=pk, user=request.user).first()
+        if not favorite:
+            return Response({"error": "Favorito não encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        favorite.hard_delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class OrderItemViewSet(viewsets.ModelViewSet):

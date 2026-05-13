@@ -3,6 +3,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { RegisterRequest } from './authAPI';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 
 // definir a schema de validação usando yup
@@ -17,18 +18,25 @@ type RegisterFormData = yup.InferType<typeof registerSchema>;
 
 export default function RegisterForm() {
     const navigate = useNavigate();
+    const [serverError, setServerError] = useState(''); // 2. Crie o estado para o erro
 
-    // configurar o react-hook-form com a validação do yup
     const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
         resolver: yupResolver(registerSchema),
     });
 
     const onSubmit = async (data: RegisterFormData) => {
+        setServerError(''); // Limpa os erros antigos antes de tentar de novo
         try {
             await RegisterRequest(data.username, data.email, data.password, data.role);
             navigate('/login');
         } catch (err: any) {
-            console.error('Erro ao registrar usuário:', err);
+            // 3. Captura a mensagem de erro do Django e coloca na tela
+            const mensagem = err.response?.data?.detail 
+                || err.response?.data?.email?.[0]
+                || err.response?.data?.username?.[0]
+                || "Erro ao registrar usuário. Tente novamente.";
+            
+            setServerError(mensagem);
         }
     };
 
@@ -77,7 +85,13 @@ export default function RegisterForm() {
                 </select>
                 {errors.role && <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>}
             </div>
+            {serverError && (
+                <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm border border-red-200">
+                    {serverError}
+                </div>
+            )}
             <button
+            
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
             >
