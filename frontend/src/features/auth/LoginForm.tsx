@@ -8,7 +8,6 @@ import { type RootState } from '../../app/store';
 import { useNavigate } from 'react-router-dom';
 
 
-
 // definir a schema de validação usando yup
 const loginSchema = yup.object().shape({
     email: yup.string().email('Email inválido').required('Email é obrigatório'),
@@ -37,9 +36,6 @@ export default function LoginForm() {
                 const payload = response.data?.user ?? response.data; // busca o objeto user ou usa o response.data diretamente
                 dispatch(loginSuccess(payload));
                 navigate('/'); // Redireciona para a página inicial após o login bem-sucedido
-            } else {
-                dispatch(loginFailure("Erro inesperado ao fazer login, verifique suas credenciais e tente novamente."));
-                navigate('/login'); // Redireciona de volta para a página de login
             }
         } catch (error: any) {
             // Tratamento seguro da mensagem de erro

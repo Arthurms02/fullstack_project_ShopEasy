@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate, useSearchParams } from "react-router";
+import { useParams, Link, useNavigate } from "react-router";
 import {
   ShoppingCart,
   ArrowLeft,
@@ -10,13 +10,11 @@ import {
   Package,
   AlertCircle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import ProductCard  from "../components/ProductCard";
-import { useSelector, useDispatch } from "react-redux";
-import type { RootState } from "../app/store";
-import { queryProducts } from "../features/product/productAPI";
-import { fetchProductsSuccess } from "../features/product/productSlice";
+import { useQuery } from "@tanstack/react-query";
 import { addToCart } from "../features/cart/cartSlice";
+import { getProduct, listAllProducts } from "../features/product/productAPI";
 
 
 export default function ProductDetail() {
@@ -26,36 +24,23 @@ export default function ProductDetail() {
   const [wishlist, setWishlist] = useState(false);
   const [added, setAdded] = useState(false);
 
+  const { data: product, isLoading } = useQuery({
+    queryKey: ["product", id],
+    queryFn: () => getProduct(Number(id)),
+    enabled: !!id,
+  });
 
-  const {  isLoading, error } = useSelector((state: RootState) => state.products) ;
-  const product = useSelector((state: RootState) => state.products.products.find(p => p.id === Number(id)));
-  const { products } = useSelector((state: RootState) => state.products);
-  const dispatch = useDispatch();
-
-  const [searchParams] = useSearchParams();
-
-  const searchQuery = searchParams.get("q") || "";
-
-  useEffect(() => {
-    (async () => {
-      try {
-        if (searchQuery.trim()){
-          const result = await queryProducts(searchQuery);
-            dispatch(fetchProductsSuccess(result));
-          }
-        } catch (e) {
-          console.error("Falha ao carregar produtos:", e);
-        }
-      })();
-    }, [searchQuery]);
-
+  const { data: products, isLoading: isLoadingProducts } = useQuery({
+    queryKey: ["products"],
+    queryFn: () => listAllProducts(),
+  });
   // Produtos relacionados: outros da lista excluindo o atual
   const related = products
     ? products.filter((p) => p.id !== product?.id).slice(0, 4)
     : [];
 
 
-  if (isLoading) {
+  if (isLoadingProducts) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader2 className="w-10 h-10 text-orange-400 animate-spin" />
@@ -63,7 +48,7 @@ export default function ProductDetail() {
     );
   }
 
-  if (!products) {
+  if (!product) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

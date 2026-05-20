@@ -21,6 +21,8 @@
     "react-hook-form": "^7.75.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.14.2",
+    "redux": "^5.0.1",
+    "redux-persist": "^6.0.0",
     "tailwindcss": "^4.2.4",
     "yup": "^1.7.1"
   },

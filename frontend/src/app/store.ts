@@ -4,6 +4,8 @@ import cartReducer from '../features/cart/cartSlice';
 import productReducer from '../features/product/productSlice';
 import favoritesReducer from '../features/product/favoriteSlice';
 
+
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -12,6 +14,7 @@ export const store = configureStore({
     favorites: favoritesReducer,
   },
 })
+
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>
