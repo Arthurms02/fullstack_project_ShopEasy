@@ -43,8 +43,6 @@ function AppContent() {
       dispatch(setFavoritesList(favoriteIds));
       return favoriteIds;
     },
-    // O 'enabled' é a mágica: só roda essa query se NÃO estiver carregando a sessão
-    // e se o usuário estiver autenticado
     enabled: !isLoadingSession,
     retry: false,
   });

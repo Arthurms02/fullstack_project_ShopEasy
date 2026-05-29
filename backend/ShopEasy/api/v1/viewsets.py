@@ -135,24 +135,6 @@ class CartViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer(cart, context=self.get_serializer_context())
         return Response(serializer.data)
 
-    def create(self, request):
-        product_id = request.data.get("productId")
-        qty = int(request.data.get("quantity", 1))
-        if not product_id:
-            return Response({"error": "productId required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            product = Product.objects.get(pk=product_id)
-        except Product.DoesNotExist:
-            return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        cart = self.get_cart(request.user)
-        item, created = CartItem.objects.get_or_create(cart=cart, product=product, defaults={"quantity": qty})
-        if not created:
-            item.quantity += qty
-            item.save()
-
-        return Response(CartSerializer(cart, context=self.get_serializer_context()).data, status=status.HTTP_201_CREATED)
-
     def retrieve(self, request, pk=None):
         item = CartItem.objects.filter(pk=pk, cart__user=request.user).first()
         if not item:

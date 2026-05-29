@@ -2,6 +2,7 @@ import api from "../../services/api";
 
 
 export const loginRequest = async (email: string, password: string) => {
+
     try {
         const response = await api.post('/api/token/', { email, password });
         return response; // Retorna os dados do usuário

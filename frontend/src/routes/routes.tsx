@@ -18,8 +18,6 @@ const ProductDetail = lazy(() => import("../pages/ProductDetail"));
 function PrivateRoute({ children }: { children: JSX.Element }) {
     const { isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
 
-
-
     if (isLoading) {
         return <Loading text="Carregando..." />;
     }
