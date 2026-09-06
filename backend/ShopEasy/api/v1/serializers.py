@@ -1,5 +1,4 @@
 from decimal import Decimal
-
 from rest_framework import serializers
 from ShopEasy.models import Cart, CartItem, Category, Favorite, Product, Order, PaymentTransaction, OrderItem, User
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer

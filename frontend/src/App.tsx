@@ -79,6 +79,29 @@ function AppContent() {
 
 function App() {
 
+<<<<<<< HEAD
+=======
+  const dispatch = useDispatch();
+
+    useEffect(() => {
+        const checkSession = async () => {
+            try {
+                // Tente acessar uma rota protegida
+                const res = await api.get('/api/v1/users/me/'); // Exemplo de rota protegida
+                dispatch(loginSuccess(res.data));
+
+                // Se autenticado, carregue os favoritos
+                const favoriteIds = await fetchFavorites();
+                dispatch(setFavoritesList(favoriteIds));
+            } catch (err) {
+                // O interceptor já vai tentar o refresh antes de chegar aqui
+                dispatch(loginFailure("Usuário não autenticado"));
+            }
+        };
+        checkSession();
+    }, [dispatch]);
+
+>>>>>>> feature-carinho
   return (
     <QueryClientProvider client={queryClient}>
       <AppContent />

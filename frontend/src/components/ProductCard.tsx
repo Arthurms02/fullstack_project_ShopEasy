@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { ShoppingCart, Heart } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { ProductCardProps } from "../features/product/productType";
 import { addToCart } from "../features/cart/cartSlice";
@@ -10,17 +10,12 @@ import { setFavorites, removeFavorite } from "../features/product/favoriteSlice"
 import type { RootState } from "../app/store";
 
 
-
 export default function ProductCard({ product }: ProductCardProps) {
 
   const dispatch = useDispatch();
   const [added, setAdded] = useState(false);
   const favorite = useSelector((state: RootState) => state.favorites.items.includes(product.id));
 
-  // useEffect(() => {
-  //   // Sincroniza o estado local com o estado global de favoritos
-  //   // Isso é útil caso o usuário tenha favoritado/desfavoritado o produto em outra parte do app
-  // }, [favorite]);
 
   const generateRandomDiscount = (productId: number): number => {
   // Usa o ID como seed para gerar sempre o mesmo desconto
