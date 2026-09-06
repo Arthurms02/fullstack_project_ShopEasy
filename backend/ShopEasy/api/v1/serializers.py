@@ -98,10 +98,19 @@ class CartSerializer(serializers.ModelSerializer):
         return sum(int(i.quantity) * Decimal(i.product.price) for i in obj.items.all())
 
 
-
-
 class CookieTokenRefreshSerializer(TokenRefreshSerializer):
+    refresh = serializers.CharField(required=False)  # ← Permite que o body venha vazio
     def validate(self, attrs):
-        if not attrs.get("refresh"):
-            attrs["refresh"] = self.context["request"].COOKIES.get("refresh_token")
+        request = self.context.get("request")
+        refresh = attrs.get("refresh") or (request.COOKIES.get("refresh_token") if request else None)
+        if not refresh:
+            raise serializers.ValidationError({"refresh": "Nenhum refresh token encontrado nos cookies."})
+        attrs["refresh"] = refresh
         return super().validate(attrs)
+
+
+# class CookieTokenRefreshSerializer(TokenRefreshSerializer):
+#     def validate(self, attrs):
+#         if not attrs.get("refresh"):
+#             attrs["refresh"] = self.context["request"].COOKIES.get("refresh_token")
+#         return super().validate(attrs)

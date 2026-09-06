@@ -147,13 +147,14 @@ USE_I18N = True
 USE_TZ = True
 
 
-CORS_ALLOW_ALL_ORIGINS = True
 
-# Permitir envio de cookies e credenciais (para httpOnly cookies ou JWT)
+# Substituir CORS_ALLOW_ALL_ORIGINS por origens explícitas para permitir cookies:
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 CORS_ALLOW_CREDENTIALS = True
-
-# True em produção com HTTPS
-SECURE_COOKIE = False
+SECURE_COOKIE = False  # True apenas em produção (HTTPS)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/

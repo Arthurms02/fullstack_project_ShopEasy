@@ -1,14 +1,14 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { AppRoutes } from "./routes/routes";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch ,useSelector } from "react-redux";
 import { type RootState } from "./app/store";
 import { loginFailure, loginSuccess } from "./features/auth/authSlice";
 import api from "./services/api";
 import Loading from "./components/Loading";
+import { useQuery } from "@tanstack/react-query";
 import { fetchFavorites } from "./features/product/productAPI";
 import { setFavoritesList } from "./features/product/favoriteSlice";
-import { useQuery } from "@tanstack/react-query";
 import { fetchCart } from "./features/cart/cartAPI"
 import { setCart } from "./features/cart/cartSlice"
 
@@ -43,7 +43,7 @@ function AppContent() {
       dispatch(setFavoritesList(favoriteIds));
       return favoriteIds;
     },
-    enabled: !isLoadingSession,
+    enabled: !isLoadingSession && isAuthenticated == true, // Só busca se a sessão estiver carregada e o usuário autenticado
     retry: false,
   });
 
@@ -55,7 +55,7 @@ function AppContent() {
       dispatch(setCart(cart));
       return cart;
     },
-    enabled: !isLoadingSession,
+    enabled: !isLoadingSession && isAuthenticated == true, // Só busca se a sessão estiver carregada e o usuário autenticado
     staleTime: 1000 * 60,
     retry:false,
   })

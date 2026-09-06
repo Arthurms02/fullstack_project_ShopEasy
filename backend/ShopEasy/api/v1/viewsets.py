@@ -407,6 +407,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 secure=settings.SECURE_COOKIE,
                 samesite="Lax",
                 max_age=30 * 24 * 60 * 60,  # 30 dias
+                path="/"
             )
             email_login = request.data.get("email")
             user_auth = User.objects.filter(email=email_login).first()
@@ -417,6 +418,23 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             response.data["user"] = serializer.data
         return response
 
-
 class CustomTokenRefreshView(TokenRefreshView):
     serializer_class = CookieTokenRefreshSerializer
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 200:
+            access_token = response.data.get("access")
+            if access_token:
+                response.set_cookie(
+                    key="access_token",
+                    value=access_token,
+                    httponly=True,
+                    secure=settings.SECURE_COOKIE,
+                    samesite="Lax",
+                    max_age=86400,
+                    path="/"
+                )
+        return response
+
+# class CustomTokenRefreshView(TokenRefreshView):
+#     serializer_class = CookieTokenRefreshSerializer
