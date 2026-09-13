@@ -10,12 +10,13 @@ import {
   Package,
   AlertCircle,
 } from "lucide-react";
-import {  useState } from "react";
-import ProductCard  from "../components/ProductCard";
+import { useState } from "react";
+import ProductCard from "../components/ProductCard";
 import { useQuery } from "@tanstack/react-query";
 import { addToCart } from "../features/cart/cartSlice";
 import { getProduct, listAllProducts } from "../features/product/productAPI";
-
+import { useSelector } from "react-redux";
+import type { RootState } from "../app/store";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -23,6 +24,8 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [wishlist, setWishlist] = useState(false);
   const [added, setAdded] = useState(false);
+
+  const userId = useSelector((state: RootState) => state.auth.id);
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -39,7 +42,6 @@ export default function ProductDetail() {
     ? products.filter((p) => p.id !== product?.id).slice(0, 4)
     : [];
 
-
   if (isLoadingProducts) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -54,7 +56,10 @@ export default function ProductDetail() {
         <div className="text-center">
           <span className="text-6xl mb-4 block">😕</span>
           <h2 className="text-gray-700 mb-2">Produto não encontrado</h2>
-          <Link to="/produtos" className="text-orange-500 hover:underline text-sm">
+          <Link
+            to="/produtos"
+            className="text-orange-500 hover:underline text-sm"
+          >
             Voltar para produtos
           </Link>
         </div>
@@ -76,9 +81,10 @@ export default function ProductDetail() {
 
   const handleBuyNow = () => {
     if (!inStock) return;
-    for (let i = 0; i < quantity; i++)
-    navigate("/carrinho");
+    for (let i = 0; i < quantity; i++) navigate("/carrinho");
   };
+
+  const isOwner = product?.created_by === userId; // Substitua 1 pelo ID do usuário autenticado
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -93,9 +99,13 @@ export default function ProductDetail() {
             Voltar
           </button>
           <span>/</span>
-          <Link to="/produtos" className="hover:text-gray-700">Produtos</Link>
+          <Link to="/produtos" className="hover:text-gray-700">
+            Produtos
+          </Link>
           <span>/</span>
-          <span className="text-gray-700 truncate max-w-[200px]">{product?.name}</span>
+          <span className="text-gray-700 truncate max-w-[200px]">
+            {product?.name}
+          </span>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 mb-12">
@@ -126,8 +136,16 @@ export default function ProductDetail() {
           {/* Info */}
           <div>
             <h1 className="text-gray-900 mb-4 text-2xl">{product?.name}</h1>
-
+            <div className="mb-4">
+              {isOwner && (
+                <span className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 border border-blue-200 text-xs px-3 py-1.5 rounded-full font-medium">
+                  <Shield className="w-3.5 h-3.5" />
+                  Você é o dono deste produto
+                </span>
+              )}
+            </div>
             {/* Stock status */}
+
             <div className="flex items-center gap-2 mb-4">
               {!inStock ? (
                 <span className="inline-flex items-center gap-1.5 bg-red-50 text-red-700 border border-red-200 text-xs px-3 py-1.5 rounded-full font-medium">
@@ -181,7 +199,9 @@ export default function ProductDetail() {
                     {quantity}
                   </span>
                   <button
-                    onClick={() => setQuantity(Math.min(product?.stock || 0, quantity + 1))}
+                    onClick={() =>
+                      setQuantity(Math.min(product?.stock || 0, quantity + 1))
+                    }
                     className="px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors"
                   >
                     +
@@ -209,8 +229,8 @@ export default function ProductDetail() {
                   !inStock
                     ? "border-gray-200 text-gray-400 cursor-not-allowed"
                     : added
-                    ? "bg-green-500 border-green-500 text-white"
-                    : "border-orange-500 text-orange-500 hover:bg-orange-50"
+                      ? "bg-green-500 border-green-500 text-white"
+                      : "border-orange-500 text-orange-500 hover:bg-orange-50"
                 }`}
               >
                 <ShoppingCart className="w-5 h-5" />
@@ -226,7 +246,9 @@ export default function ProductDetail() {
               </div>
               <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-3">
                 <Truck className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                <span className="text-gray-600 text-xs">Frete para todo Brasil</span>
+                <span className="text-gray-600 text-xs">
+                  Frete para todo Brasil
+                </span>
               </div>
             </div>
           </div>
@@ -235,7 +257,9 @@ export default function ProductDetail() {
         {/* Description */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-10">
           <h2 className="text-gray-900 mb-4">Descrição do Produto</h2>
-          <p className="text-gray-600 text-sm leading-relaxed">{product?.description}</p>
+          <p className="text-gray-600 text-sm leading-relaxed">
+            {product?.description}
+          </p>
         </div>
 
         {/* Related products */}

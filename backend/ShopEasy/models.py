@@ -82,6 +82,7 @@ class Product(BaseModel):
     stock = models.PositiveIntegerField()
     image_url = models.URLField(max_length=500, blank=True, null=True)
     condition = models.CharField(max_length=50, choices=CHOICES, default='Novo')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products')
 
 
 

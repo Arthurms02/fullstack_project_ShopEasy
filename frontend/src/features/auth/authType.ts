@@ -13,6 +13,7 @@ export type User = {
 };
 
 export type AuthState = {
+    id: number | null;
     isAuthenticated: boolean | null;
     role: string | null;
     nome_completo: string | null;

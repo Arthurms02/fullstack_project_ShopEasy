@@ -2,6 +2,7 @@ from decimal import Decimal
 from rest_framework import serializers
 from ShopEasy.models import Cart, CartItem, Category, Favorite, Product, Order, PaymentTransaction, OrderItem, User
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from rest_framework_simplejwt.exceptions import InvalidToken
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -39,11 +40,25 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
 class ProductSerializer(serializers.ModelSerializer):
+    created_by = serializers.ReadOnlyField(source='created_by.id')  # Apenas leitura, não pode ser alterado pelo usuário
+    owner_name = serializers.ReadOnlyField(source='created_by.nome_completo')  # Nome do dono do produto
 
     class Meta:
         model = Product
-        exclude = ['deleted_at', 'created_at', 'updated_at']
-
+        fields = [
+            'id',
+            'name',
+            'description',
+            'price',
+            'stock',
+            'image_url',
+            'condition',
+            'created_by',
+            'owner_name',
+            'created_at',
+        ]
+        read_only_fields = ['id', 'created_by', 'owner_name', 'created_at']
+        
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -96,16 +111,33 @@ class CartSerializer(serializers.ModelSerializer):
     def get_total_price(self, obj):
         return sum(int(i.quantity) * Decimal(i.product.price) for i in obj.items.all())
 
-
 class CookieTokenRefreshSerializer(TokenRefreshSerializer):
-    refresh = serializers.CharField(required=False)  # ← Permite que o body venha vazio
+    # Torna o campo opcional para requisições com body vazio
+    refresh = serializers.CharField(required=False, allow_blank=True, default="")
+
     def validate(self, attrs):
         request = self.context.get("request")
-        refresh = attrs.get("refresh") or (request.COOKIES.get("refresh_token") if request else None)
-        if not refresh:
-            raise serializers.ValidationError({"refresh": "Nenhum refresh token encontrado nos cookies."})
-        attrs["refresh"] = refresh
+        refresh_token = attrs.get("refresh")
+
+        # Se não veio no body, busca nos cookies
+        if not refresh_token and request:
+            refresh_token = request.COOKIES.get("refresh_token")
+
+        if not refresh_token:
+            raise InvalidToken("Nenhum token de atualização fornecido.")
+
+        attrs["refresh"] = refresh_token
         return super().validate(attrs)
+
+# class CookieTokenRefreshSerializer(TokenRefreshSerializer):
+#     refresh = serializers.CharField(required=False)  # ← Permite que o body venha vazio
+#     def validate(self, attrs):
+#         request = self.context.get("request")
+#         refresh = attrs.get("refresh") or (request.COOKIES.get("refresh_token") if request else None)
+#         if not refresh:
+#             raise serializers.ValidationError({"refresh": "Nenhum refresh token encontrado nos cookies."})
+#         attrs["refresh"] = refresh
+#         return super().validate(attrs)
 
 
 # class CookieTokenRefreshSerializer(TokenRefreshSerializer):

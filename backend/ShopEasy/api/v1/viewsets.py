@@ -1,4 +1,5 @@
 
+from ShopEasy.permissions import IsOwnerOrReadOnly
 from rest_framework import viewsets, status, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -74,7 +75,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny, IsOwnerOrReadOnly]
     search_fields = ['name', 'description']
 
     filter_backends = [CustomSearchFilter]
@@ -82,6 +83,10 @@ class ProductViewSet(viewsets.ModelViewSet):
     ordering_fields = ['id', 'name', 'price', 'created_at']  # Campos que podem ser ordenados
     ordering = ['-created_at']  # Padrão: mais recentes primeiro
 
+
+    def perform_create(self, serializer):
+        # Associa automaticamente o produto ao usuário extraído do JWT
+        serializer.save(created_by=self.request.user)
 
     def get_queryset(self):
         queryset = Product.objects.all()
@@ -414,9 +419,52 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             user_auth = User.objects.filter(email=email_login).first()
 
             serializer = UserSerializer(user_auth)
-            del response.data["access"]
-            del response.data["refresh"]
             response.data["user"] = serializer.data
+        return response
+
+class CookieTokenRefreshView(TokenRefreshView):
+    serializer_class = CookieTokenRefreshSerializer
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+
+        if response.status_code == 200:
+            jwt_settings = getattr(settings, "SIMPLE_JWT", {})
+            is_secure = not settings.DEBUG
+
+            # Atualiza o access_token no cookie
+            access_token = response.data.get("access")
+            if access_token:
+                access_lifetime = jwt_settings.get("ACCESS_TOKEN_LIFETIME")
+                access_max_age = int(access_lifetime.total_seconds()) if access_lifetime else 86400
+
+                response.set_cookie(
+                    key="access_token",
+                    value=access_token,
+                    httponly=True,
+                    secure=is_secure,
+                    samesite="Lax",
+                    max_age=access_max_age,
+                    path="/"
+                )
+                del response.data["access"]
+
+            # Se ROTATE_REFRESH_TOKENS estiver ativo, atualiza também o refresh_token
+            refresh_token = response.data.get("refresh")
+            if refresh_token:
+                refresh_lifetime = jwt_settings.get("REFRESH_TOKEN_LIFETIME")
+                refresh_max_age = int(refresh_lifetime.total_seconds()) if refresh_lifetime else 30 * 24 * 60 * 60
+
+                response.set_cookie(
+                    key="refresh_token",
+                    value=refresh_token,
+                    httponly=True,
+                    secure=is_secure,
+                    samesite="Lax",
+                    max_age=refresh_max_age,
+                    path="/api/token/refresh/"
+                )
+
         return response
 
 class CustomTokenRefreshView(TokenRefreshView):

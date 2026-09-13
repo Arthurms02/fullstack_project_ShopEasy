@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { AppRoutes } from "./routes/routes";
-import { useDispatch ,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { type RootState } from "./app/store";
 import { loginFailure, loginSuccess } from "./features/auth/authSlice";
 import api from "./services/api";
@@ -9,13 +9,17 @@ import Loading from "./components/Loading";
 import { useQuery } from "@tanstack/react-query";
 import { fetchFavorites } from "./features/product/productAPI";
 import { setFavoritesList } from "./features/product/favoriteSlice";
-import { fetchCart } from "./features/cart/cartAPI"
-import { setCart } from "./features/cart/cartSlice"
+import { fetchCart } from "./features/cart/cartAPI";
+import { setCart } from "./features/cart/cartSlice";
+import { useEffect } from "react";
+import { CookiesProvider } from 'react-cookie';
 
 const queryClient = new QueryClient();
 
 function AppContent() {
-  const { isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, isLoading } = useSelector(
+    (state: RootState) => state.auth,
+  );
   const dispatch = useDispatch();
 
   // Busca a sessão do usuário
@@ -57,8 +61,8 @@ function AppContent() {
     },
     enabled: !isLoadingSession && isAuthenticated == true, // Só busca se a sessão estiver carregada e o usuário autenticado
     staleTime: 1000 * 60,
-    retry:false,
-  })
+    retry: false,
+  });
 
   // Mostra o loading controlado pelo React Query
   if (isLoadingSession) {
@@ -76,37 +80,34 @@ function AppContent() {
   );
 }
 
-
 function App() {
-
-<<<<<<< HEAD
-=======
   const dispatch = useDispatch();
 
-    useEffect(() => {
-        const checkSession = async () => {
-            try {
-                // Tente acessar uma rota protegida
-                const res = await api.get('/api/v1/users/me/'); // Exemplo de rota protegida
-                dispatch(loginSuccess(res.data));
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        // Tente acessar uma rota protegida
+        const res = await api.get("/api/v1/users/me/"); // Exemplo de rota protegida
+        dispatch(loginSuccess(res.data));
 
-                // Se autenticado, carregue os favoritos
-                const favoriteIds = await fetchFavorites();
-                dispatch(setFavoritesList(favoriteIds));
-            } catch (err) {
-                // O interceptor já vai tentar o refresh antes de chegar aqui
-                dispatch(loginFailure("Usuário não autenticado"));
-            }
-        };
-        checkSession();
-    }, [dispatch]);
+        // Se autenticado, carregue os favoritos
+        const favoriteIds = await fetchFavorites();
+        dispatch(setFavoritesList(favoriteIds));
+      } catch (err) {
+        // O interceptor já vai tentar o refresh antes de chegar aqui
+        dispatch(loginFailure("Usuário não autenticado"));
+      }
+    };
+    checkSession();
+  }, [dispatch]);
 
->>>>>>> feature-carinho
   return (
-    <QueryClientProvider client={queryClient}>
-      <AppContent />
-    </QueryClientProvider>
-  )
+    <CookiesProvider>
+      <QueryClientProvider client={queryClient}>
+        <AppContent />
+      </QueryClientProvider>
+    </CookiesProvider>
+  );
 }
 
-export default App
+export default App;

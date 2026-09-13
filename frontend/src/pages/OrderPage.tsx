@@ -57,7 +57,7 @@ export default function Checkout() {
   const navigate = useNavigate();
   const { items, totalPrice } = useSelector((state: RootState) => state.cart);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   const {
     register,

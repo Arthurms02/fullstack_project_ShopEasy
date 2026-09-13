@@ -4,6 +4,7 @@ import type { LoginPayload } from './authType'
 
 
 const initialState: AuthState = {
+    id: null,
     nome_completo: null,
     email: null,
     role: null,
@@ -22,6 +23,7 @@ const authSlice = createSlice({
             state.error = null;
         },
         loginSuccess: (state, action: PayloadAction<LoginPayload>) => {
+            state.id = action.payload.id;
             state.isLoading = false;
             state.nome_completo = action.payload.nome_completo;
             state.email = action.payload.email;
@@ -34,6 +36,7 @@ const authSlice = createSlice({
             state.isAuthenticated = false;
         },
         logout: (state) => {
+            state.id = null;
             state.nome_completo = null;
             state.email = null;
             state.role = null;
