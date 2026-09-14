@@ -3,7 +3,9 @@ import MainPage from "./_components/MainPage";
 import CardProduct from "./_components/CardProduct";
 
 
-export default function HomePage() {
+
+export default async function HomePage() {
+
   return (
     <div>
       <HeaderHome />

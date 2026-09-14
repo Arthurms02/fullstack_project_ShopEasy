@@ -6,4 +6,5 @@ export type Product = {
   stock: number;
   image_url: string | null;
   condition: string;
+  created_by: number;
 };
