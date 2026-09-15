@@ -4,11 +4,14 @@ import Image from "next/image";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Product } from "@/types/type";
 import { deleteProduct } from "../_services/productAction";
+import { useState } from "react";
+import { ProductForm } from "./FormCreateOrUpdateProd";
 
 
 
 export function ProductItem({ product, isOwner, token }: { product: Product; isOwner: boolean; token: string }) {
 
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleDelete = async () => {
     try {
@@ -32,9 +35,28 @@ export function ProductItem({ product, isOwner, token }: { product: Product; isO
             <button
               aria-label="Editar"
               className="rounded-full bg-white/90 p-2 text-gray-700 hover:bg-white transition"
+              onClick={() => setIsOpen(true)}
+              type="button"
             >
               <Pencil size={14} />
             </button>
+            {isOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    className="absolute right-2 top-2 text-xl"
+                    aria-label="Fechar formulário"
+                  >
+                    X
+                  </button>
+
+                  <ProductForm produtoInicial={product} />
+                </div>
+              </div>
+            )}
+
             <button
               aria-label="Excluir"
               className="rounded-full bg-white/90 p-2 text-red-600 hover:bg-white transition"
