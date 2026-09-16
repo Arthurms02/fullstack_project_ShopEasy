@@ -7,9 +7,9 @@ import { ProductItem } from "../_components/ProductItem";
 
 
 export default async function CardProduct() {
-  const products = await getProducts();
   const session = await getServerSession(authOptions);
   const currentUserId = Number(session?.user?.id);
+  const products = await getProducts(session?.accessToken || "");
 
   return (
     <section id="colecao" className="mx-auto max-w-7xl px-6 pb-24 lg:px-10">
